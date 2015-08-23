@@ -34,7 +34,7 @@ public class Main {
 		
 		rt.nearestN(p, new TIntProcedure() {
 			public boolean execute(int i) {
-				 System.out.println("Rectangle " + i + " " + rects[i] + ", distance=" + rects[i].distance(p));
+				 System.out.println("Rectangle " + i + " " + rects[i] + ", distance =" + rects[i].distance(p));
 				 return true;
 			}}, 3, Float.MAX_VALUE);
 
