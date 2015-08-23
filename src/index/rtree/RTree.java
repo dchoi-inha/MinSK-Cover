@@ -80,7 +80,7 @@ public class RTree implements SpatialIndex {
   private TIntStack parents = new TIntStack();
   private TIntStack parentsEntry = new TIntStack();
   
-  // initialisation
+  // initialization
   private int treeHeight = 1; // leaves are always level 1
   private int rootNodeId = 0;
   private int size = 0;
