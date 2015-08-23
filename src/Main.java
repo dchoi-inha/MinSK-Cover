@@ -15,7 +15,6 @@ public class Main {
 		int rowCount = 1000;
 		int columnCount = 1000;
 		int count = rowCount * columnCount;
-		long start, end;
 		
 		SpatialIndex rt = new RTree();
 		rt.init(null);
