@@ -14,21 +14,19 @@ public class Node {
 	public Node(boolean flag){
 		isleaf = flag;
 		parent = null;
-		entryList = new ArrayList<Entry>();
 		x = new Pair();
 		y = new Pair();
-		x.l = Env.MaxCoord;
-		x.h = 0;
-		y.l = Env.MaxCoord;
-		y.h = 0;
+		initEntries();
 	}
 	public Node(){
 		isleaf = false;
 		parent = null;
-		entryList = new ArrayList<Entry>();
-		
 		x = new Pair();
 		y = new Pair();
+		initEntries();
+	}
+	public void initEntries(){
+		entryList = new ArrayList<Entry>();
 		x.l = Env.MaxCoord;
 		x.h = 0;
 		y.l = Env.MaxCoord;
@@ -60,7 +58,7 @@ public class Node {
 		updateMBR(e);
 		return e;
 	}
-	public long diffArea(Entry e) { 
+	public long diffArea(Entry e) { // area difference if e is inserted
 		long s = area();
 		int xl, xh, yl, yh;
 		xl = Math.min(x.l, e.x.l);
@@ -71,8 +69,8 @@ public class Node {
 		return r-s;
 	}	
 	public Entry find(Node n){
-		for (int a=0; a<size(); a++)
-			if (get(a).child.equals(n)) return get(a);
+		for (int i=0; i<size(); i++)
+			if (get(i).child.equals(n)) return get(i);
 		return null;
 	}	
 	public long area(){        // return area

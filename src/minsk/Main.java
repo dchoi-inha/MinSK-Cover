@@ -24,7 +24,10 @@ public class Main {
 		System.out.print("Insertion Start\n");
 		while ((s=in.readLine())!=null){
 			array = s.split("\t");
-			Entry e = new Entry(Integer.parseInt(array[0]),Integer.parseInt(array[1]),Integer.parseInt(array[2]),Integer.parseInt(array[3]));
+			Entry e = new Entry(Integer.parseInt(array[0]),
+					Integer.parseInt(array[1]),
+					Integer.parseInt(array[2]),
+					Integer.parseInt(array[3]));
 //			System.out.print("Insert "+count+" node "+e.x.l+" "+e.x.h+" "+e.y.l+" "+e.y.h+"\n"); 
 			R.insert(e);
 			count ++; 
@@ -32,7 +35,7 @@ public class Main {
 		System.out.print("Insertion End\n");
 		in.close();
 
-		System.out.print("Nodes : "+R.nodes+" heights: "+R.height+"\n");
+		System.out.print("objects: " + count + " nodes: "+R.nodes+" heights: "+R.height+ "\n");
 		return R;
 	}
 

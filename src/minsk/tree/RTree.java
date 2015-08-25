@@ -3,8 +3,8 @@ package minsk.tree;
 import java.util.ArrayList;
 
 public class RTree {
-	public static final int M = 10;
-	public static final int m = 5;
+	public static final int M = 20;
+	public static final int m = 10;
 	public Node R=null;
 	public int nodeCount = 0;
 	public int leafCount = 0;
@@ -28,18 +28,12 @@ public class RTree {
 	}
 	public ArrayList<Entry> search(int xl, int xh, int yl, int yh){
 		ArrayList<Entry> result = new ArrayList<Entry>(); 
-		//int count = 1;
 		nodeCount = 0;
 		leafCount = 0;
 		_search(R, xl, xh, yl, yh, result);
-		/*for (int a=0; a<result.size(); a++){
-			Entry e = result.get(a);
-			System.out.println("Index Entry x: "+e.x.l+" "+e.x.h+ ", y: "+e.y.l+" "+e.y.h);
-			count++;
-		}*/
+
 		return result;
 
-		//System.out.print("result: "+(count-1)+"\n"); 
 	}
 
 	/* Insert */
@@ -63,19 +57,19 @@ public class RTree {
 		}
 		return n;
 	}
-	private Entry[] pickSeeds(Node a){
+	private Entry[] pickSeeds(Node n){ // return the most wasteful pair of entries
 		Entry me1=null;
 		Entry me2=null;
-		long d =-1;
-		for (int i=0; i<a.size(); i++) {
-			for (int j=i+1; j<a.size(); j++){
-				Entry e1 = a.get(i);
-				Entry e2 = a.get(j);
+		long d = -1;
+		for (int i=0; i<n.size(); i++) {
+			for (int j=i+1; j<n.size(); j++){
+				Entry e1 = n.get(i);
+				Entry e2 = n.get(j);
 				Node l = new Node();
 				l.add(e1);
 				l.add(e2);
 				long k = l.area()-e1.area()-e2.area();
-				if (me1==null||d<k){
+				if (me1==null || d<k) {
 					me1 = e1; me2 = e2;
 					d = k;
 				}
@@ -86,16 +80,16 @@ public class RTree {
 		result[1] = me2;
 		return result;
 	}
-	private Entry pickNext(ArrayList<Entry> a, Node l1, Node l2){
+	private Entry pickNext(ArrayList<Entry> remain, Node l1, Node l2){
 		long d =-1;
 		Entry k = null;
-		for (int i = 0; i<a.size(); i++){
-			Entry r = a.get(i);
-			long d1 = l1.diffArea(r);
-			long d2 = l2.diffArea(r);
+		for (int i = 0; i<remain.size(); i++){
+			Entry e = remain.get(i);
+			long d1 = l1.diffArea(e);
+			long d2 = l2.diffArea(e);
 			if (d<Math.abs(d1-d2)){
 				d = Math.abs(d1-d2);
-				k = r;
+				k = e;
 			}
 		}
 		return k;
@@ -107,8 +101,8 @@ public class RTree {
 		n.add(e);
 		Entry[] seeds = pickSeeds(n);
 		ArrayList<Entry> temp = n.entryList;
-		n.entryList = new ArrayList<Entry>();
-		nn.entryList = new ArrayList<Entry>();
+		n.initEntries();
+		nn.initEntries();
 		long s1,s2,d1,d2;
 		n.add(seeds[0]);
 		if (!n.isleaf) seeds[0].child.parent = n;
@@ -116,23 +110,25 @@ public class RTree {
 		if (!n.isleaf) seeds[1].child.parent = nn;
 		temp.remove(seeds[0]);
 		temp.remove(seeds[1]);	
-		while (temp.size()!=0){
-			if (n.size()>=m&&(nn.size()+temp.size()==m)){
+		while (!temp.isEmpty()){
+			if (n.size() >= m && (nn.size()+temp.size() == m)){
 				Entry t = null;
-				while(temp.size()!=0){
+				while(!temp.isEmpty()){
 					t = (Entry)temp.remove(0);
 					nn.add(t);
 					if (!n.isleaf)	t.child.parent = nn;
 				}
-				break;} 
-			if (nn.size()>=m&&(n.size()+temp.size()==m)){
+				break;
+			} 
+			if (nn.size() >= m && (n.size()+temp.size() == m)){
 				Entry t = null;
 				while(temp.size()!=0) {
 					t = (Entry) temp.remove(0);
 					n.add(t);
 					if (!n.isleaf) t.child.parent = n;
 				}
-				break;}
+				break;
+			}
 			Entry next = pickNext(temp, n, nn);
 			temp.remove(next);
 			s1 = n.area();
@@ -151,13 +147,13 @@ public class RTree {
 				}
 			}
 			if (!n.isleaf) {
-				if (n.size()-l1 == 0) next.child.parent = nn;
+				if (n.size()== l1) next.child.parent = nn;
 				else next.child.parent = n;
 			}
 		}
 		return nn;
 	}
-	private void adjustTree(Node l, Node ll){   // if root�� �ɰ����� node �ƴϸ� null
+	private void adjustTree(Node l, Node ll){
 		Node n = l;
 		Node nn = ll;
 		while(!n.equals(R)){
@@ -176,7 +172,7 @@ public class RTree {
 			}
 			n = p;
 		}
-		if (nn!=null){      // root is splited!
+		if (nn!=null){      // root is split!
 			Node r = new Node(false);
 			nodes++;
 			R = r;

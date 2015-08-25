@@ -1,17 +1,18 @@
 package minsk.tree;
 
-import java.util.ArrayList;
+import minsk.Env;
 
 
 public class Entry {
 	public Pair x;
 	public Pair y;
 	public Node child;
-	public int ptr;
+	
 	public Entry(){
 		x = new Pair();
 		y = new Pair();
 	}
+	
 	public Entry(int xl, int xh, int yl, int yh){
 		x = new Pair();
 		y = new Pair();
@@ -20,29 +21,29 @@ public class Entry {
 		y.l = yl;
 		y.h = yh;
 	}
+	
 	public long area(){    
 		return (x.h-x.l)*(y.h-y.l);
 	}
+	
 	public long diffArea(Entry e){
 		return child.diffArea(e);
 	}
+	
 	public void adjust(){  
-		int xl=0,xh=0,yl=0,yh=0;
-		int flag = 1;
-		ArrayList<Entry> k = child.entryList;
-		for (int a = 0; a<k.size(); a++){
-			Entry b = (Entry) k.get(a);
-			if (flag==1 || b.x.l<xl) xl = b.x.l;
-			if (flag==1 || b.x.h>xh) xh = b.x.h;
-			if (flag==1 || b.y.l<yl) yl = b.y.l;
-			if (flag==1 || b.y.h>yh) yh = b.y.h;
-			if (flag==1) flag =0;
+		int xl=Env.MaxCoord,xh=0,yl=Env.MaxCoord,yh=0;
+		for (int i = 0; i<child.size(); i++){
+			Entry e = (Entry) child.get(i);
+			if (e.x.l<xl) xl = e.x.l;
+			if (e.x.h>xh) xh = e.x.h;
+			if (e.y.l<yl) yl = e.y.l;
+			if (e.y.h>yh) yh = e.y.h;
 		}
 		x.l = xl;
 		x.h = xh;
 		y.l = yl;
 		y.h = yh;
-		
+
 		child.x.l = xl;
 		child.x.h = xh;
 		child.y.l = yl;
