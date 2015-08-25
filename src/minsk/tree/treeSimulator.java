@@ -1,4 +1,4 @@
-package rtree;
+package minsk.tree;
 
 
 import java.io.*;

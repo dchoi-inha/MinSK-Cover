@@ -1,13 +1,13 @@
-package rtree;
+package minsk.tree;
 
 import java.util.ArrayList;
 
 
 public class Entry {
-	Pair x;
-	Pair y;
-	Node child;
-	int ptr;
+	public Pair x;
+	public Pair y;
+	public Node child;
+	public int ptr;
 	public Entry(){
 		x = new Pair();
 		y = new Pair();
@@ -20,13 +20,13 @@ public class Entry {
 		y.l = yl;
 		y.h = yh;
 	}
-	public long area(){    // entry ����Ŭ ���� 
+	public long area(){    
 		return (x.h-x.l)*(y.h-y.l);
 	}
-	public long diff(Entry e){
-		return child.diff(e);
+	public long diffArea(Entry e){
+		return child.diffArea(e);
 	}
-	public void adjust(){  // ��Ʈ���� ����Ű�� ���ȿ� �ִ� ��Ʈ������ �����ϴ� REC �缳��.
+	public void adjust(){  
 		int xl=0,xh=0,yl=0,yh=0;
 		int flag = 1;
 		ArrayList<Entry> k = child.entryList;
