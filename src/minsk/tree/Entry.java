@@ -29,7 +29,18 @@ public class Entry {
 	public long diffArea(Entry e){
 		return child.diffArea(e);
 	}
-	
+	public long overlap(Entry e){
+		int xl, xh, yl, yh;
+		
+		xl = Math.max(x.l, e.x.l);
+		xh = Math.min(x.h, e.x.h);
+		yl = Math.max(y.l, e.y.l);
+		yh = Math.min(y.h, e.y.h);
+		
+		if (xl > xh || yl > yh) return 0;
+		else return (xh-xl)*(yh-yl);
+		
+	}
 	public void adjust(){  
 		int xl=Env.MaxCoord,xh=0,yl=Env.MaxCoord,yh=0;
 		for (int i = 0; i<child.size(); i++){

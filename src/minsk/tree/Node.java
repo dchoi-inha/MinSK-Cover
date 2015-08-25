@@ -3,6 +3,7 @@ package minsk.tree;
 import java.util.ArrayList;
 
 import minsk.Env;
+import minsk.util.Debug;
 
 public class Node {
 	public boolean isleaf;   // leaf = true
@@ -58,6 +59,22 @@ public class Node {
 		updateMBR(e);
 		return e;
 	}
+	public long overlap(int i, Entry e){// overlap cost if e is inserted into i-th entry
+		int xl, xh, yl, yh;
+		xl = Math.min(get(i).x.l, e.x.l);
+		xh = Math.max(get(i).x.h, e.x.h);
+		yl = Math.min(get(i).y.l, e.y.l);
+		yh = Math.max(get(i).y.h, e.y.h);
+		Entry k = new Entry(xl, xh, yl, yh);
+		
+		long cost = 0;
+		for (int j = 0; j < size(); j++)
+		{
+			if (i == j) continue;
+			cost += k.overlap(get(j));
+		}
+		return cost;
+	}
 	public long diffArea(Entry e) { // area difference if e is inserted
 		long s = area();
 		int xl, xh, yl, yh;
@@ -67,7 +84,7 @@ public class Node {
 		yh = Math.max(y.h, e.y.h);
 		long r = (xh-xl)*(yh-yl);
 		return r-s;
-	}	
+	}
 	public Entry find(Node n){
 		for (int i=0; i<size(); i++)
 			if (get(i).child.equals(n)) return get(i);

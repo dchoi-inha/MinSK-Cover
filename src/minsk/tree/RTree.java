@@ -40,20 +40,42 @@ public class RTree {
 	private Node chooseLeaf(Entry e){
 		Node n = R;
 		while (!n.isleaf){
-			Node sn = null;
-			long s=-1, d;
-			for (int i=0; i<n.size(); i++){
-				Entry k = n.get(i);
-				d = k.diffArea(e);
-				if ( (s == -1)|| (s > d) ) {
-					s = d;
-					sn = k.child;
-				} else if (s==d) { 
-					if (sn.area() > k.area())
-						sn = k.child;
+			long mincost = Long.MAX_VALUE;
+			Entry se = null;
+			if (n.get(0).child.isleaf) { // the childpointers in N point to leaves
+				for (int i=0; i < n.size(); i++)
+				{
+					Entry k = n.get(i);
+					long cost = k.overlap(e);
+					if (mincost > cost) {
+						mincost = cost;
+						se = k;
+					} else if (mincost == cost) {
+						if (se.diffArea(e) > k.diffArea(e))
+							se = k;
+						else if (se.diffArea(e) == k.diffArea(e)) {
+							if (se.area() > k.area())
+								se = k;
+						}
+					}
+				}
+			} else {
+				long s = -1, d;
+				for (int i=0; i < n.size(); i++)
+				{
+					Entry k = n.get(i);
+					d = k.diffArea(e);
+					if (s < 0 || s > d) {
+						s = d;
+						se = k;
+					}
+					else if (s == d) {
+						if (se.area() > k.area())
+							se = k;
+					}
 				}
 			}
-			n = sn;
+			n = se.child;
 		}
 		return n;
 	}
