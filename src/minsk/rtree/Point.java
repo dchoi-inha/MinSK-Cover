@@ -1,4 +1,4 @@
-package minsk.tree;
+package minsk.rtree;
 
 
 public class Point implements Comparable<Point> {

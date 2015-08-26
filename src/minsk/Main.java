@@ -5,8 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import minsk.tree.Entry;
-import minsk.tree.RTree;
+import minsk.rtree.Entry;
+import minsk.rtree.RTree;
 import minsk.util.Debug;
 
 /**

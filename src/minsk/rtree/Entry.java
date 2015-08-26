@@ -1,4 +1,4 @@
-package minsk.tree;
+package minsk.rtree;
 
 import java.util.Comparator;
 

@@ -1,4 +1,4 @@
-package minsk.tree;
+package minsk.rtree;
 
 
 import java.io.*;
@@ -48,13 +48,12 @@ public class treeSimulator {
 	}
 
 	public static void main(String[] args) throws IOException {
-		// TODO Auto-generated method stub
 		RTree r = construct();
 		LinList linList = new LinList(construct_array());
 		double xl, xh, yl, yh;
 		double size = 0.01;
 		long measurement = 10000;
-		int k = 3;
+		int k = 5;
 		long s1 = 0, s2 = 0, s3 = 0,s4 = 0, s5 = 0;
 		long cpuTimeElapsed;
 		/* test begins */
