@@ -11,7 +11,7 @@ public class Env {
 
 	public static final String HomeDir = System.getProperty("user.home") + "/study/exp/minsk/";
 	
-	public static int MaxCoord = 1000000000;
+	public static double MaxCoord = 1.0;
 	
 
 }

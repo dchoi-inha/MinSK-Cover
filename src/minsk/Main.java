@@ -23,11 +23,11 @@ public class Main {
 		int count = 1;  
 		System.out.print("Insertion Start\n");
 		while ((s=in.readLine())!=null){
-			array = s.split("\t");
-			Entry e = new Entry(Integer.parseInt(array[0]),
-					Integer.parseInt(array[1]),
-					Integer.parseInt(array[2]),
-					Integer.parseInt(array[3]));
+			array = s.split(" ");
+			Entry e = new Entry(Double.parseDouble(array[0]),
+					Double.parseDouble(array[1]),
+					Double.parseDouble(array[0]),
+					Double.parseDouble(array[1]));
 //			System.out.print("Insert "+count+" node "+e.x.l+" "+e.x.h+" "+e.y.l+" "+e.y.h+"\n"); 
 			R.insert(e);
 			count ++; 
@@ -41,7 +41,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		try {
-			RTree rt = construct("MG.txt");
+			RTree rt = construct("NE.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

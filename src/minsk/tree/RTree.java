@@ -2,6 +2,7 @@ package minsk.tree;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.PriorityQueue;
 
 public class RTree {
 	public static final int M = 20;
@@ -9,48 +10,90 @@ public class RTree {
 	public Node R=null;
 	public int nodeCount = 0;
 	public int leafCount = 0;
-	public int compareCount = 0;
 	public int height = 0;
 	public int nodes = 0;
 
 	/* Search */
-	private void _search(Node T, int xl, int xh, int yl, int yh, ArrayList<Entry> result){
+	private void _search(Node T, double xl, double xh, double yl, double yh, ArrayList<Entry> result){
 		Entry e;
 		if (T.isleaf) leafCount++;
 		else nodeCount++;
 		for (int a=0; a<T.size(); a++){
 			e = T.get(a);
 			if (((!(xh<e.x.l || xl>e.x.h))) && (!(yl>e.y.h || yh<e.y.l))){
-				compareCount++;
 				if (T.isleaf){ // leaf
 					result.add(e);
 				}
 				else _search(e.child, xl, xh, yl, yh, result);
-			}
+			} 
 		}
 	}
-	public ArrayList<Entry> search(int xl, int xh, int yl, int yh){
+	public ArrayList<Entry> rangeSearch(double xl, double xh, double yl, double yh){
 		ArrayList<Entry> result = new ArrayList<Entry>(); 
 		nodeCount = 0;
 		leafCount = 0;
 		_search(R, xl, xh, yl, yh, result);
 
 		return result;
+	}
 
+	public Entry nextNN(Point q, PriorityQueue<Entry> pq) {
+		if (pq == null) {
+			nodeCount = 1;
+			leafCount = 0;
+			pq = new PriorityQueue<Entry>(11, Entry.CompareDist);
+			for(int i = 0; i < R.size(); i++) {
+				Entry e = R.get(i);
+				e.dist = e.distTo(q);
+				pq.add(e);
+			}
+		}
+		Entry next;
+		while ((next=pq.poll()) != null)
+		{
+			if (next.child == null) // point
+				break;
+			else {
+				if(next.child.isleaf) leafCount++;
+				else nodeCount++;
+				for(int i = 0; i < next.child.size(); i++) { // node
+					Entry e = next.child.get(i);
+					e.dist = e.distTo(q);
+					pq.add(e);
+				}
+			}
+		}
+		return next;
+	}
+
+	public ArrayList<Entry> kNNSearch(Point q, int k) {
+		ArrayList<Entry> knns = new ArrayList<Entry>();
+		nodeCount = 1;
+		leafCount = 0;
+		PriorityQueue<Entry> pq = new PriorityQueue<Entry>(11, Entry.CompareDist);
+		for(int i = 0; i < R.size(); i++) {
+			Entry e = R.get(i);
+			e.dist = e.distTo(q);
+			pq.add(e);
+		}
+		for (int i=0; i < k; i++){
+			knns.add(nextNN(q, pq));
+		}
+		return knns;
 	}
 
 	/* Insert */
 	private Node chooseLeaf(Entry e){
 		Node n = R;
 		while (!n.isleaf){
-			long mincost = Long.MAX_VALUE;
-			long s = -1, d;
+			double mincost = Double.MAX_VALUE;
+			double s = -1, d;
 			Entry se = null;
 			if (n.get(0).child.isleaf) { // the childpointers in N point to leaves
 				for (int i=0; i < n.size(); i++)
 				{
 					Entry k = n.get(i);
-					long cost = k.overlap(e);
+					double cost = k.overlap(e);
 					if (mincost > cost) {
 						mincost = cost;
 						se = k;
@@ -97,7 +140,7 @@ public class RTree {
 
 		chooseSplitAxis(temp);
 		int k = chooseSplitIndex(temp);
-		
+
 		Entry t;
 		for (int i=0; i < m-1+k; i++) {
 			t = temp.get(i);
@@ -106,15 +149,15 @@ public class RTree {
 		}
 		for (int i=m-1+k; i < M+1; i++) {
 			t = temp.get(i);
-			nn.add(temp.get(i));
+			nn.add(t);
 			if (!n.isleaf) t.child.parent = nn;
 		}
-				
+
 		return nn;
 	}
 	private int chooseSplitIndex(ArrayList<Entry> entries) {
 		int index = -1;
-		long min = Long.MAX_VALUE, cost;
+		double min = Double.MAX_VALUE, cost;
 		Node first = new Node(); Node second = new Node();
 		for (int i = 0; i < m-1; i++) {
 			first.add(entries.get(i));
@@ -122,7 +165,7 @@ public class RTree {
 		for (int i = m-1; i < M+1; i++) {
 			second.add(entries.get(i));
 		}
-		
+
 		for (int k = 0; k < M-2*m+2; k++) {
 			first.add(entries.get(m-1+k));
 			second.remove(0);
@@ -134,21 +177,21 @@ public class RTree {
 		}
 		return index;
 	}
-	private long overlap(Node n1, Node n2) {
-		int xl, xh, yl, yh;
-		
+	private double overlap(Node n1, Node n2) {
+		double xl, xh, yl, yh;
+
 		xl = Math.max(n1.x.l, n2.x.l);
 		xh = Math.min(n1.x.h, n2.x.h);
 		yl = Math.max(n1.y.l, n2.y.l);
 		yh = Math.min(n1.y.h, n2.y.h);
-		
+
 		if (xl > xh || yl > yh) return 0;
 		else return (xh-xl)*(yh-yl);
 	}
 	private void chooseSplitAxis(ArrayList<Entry> entries) { // sort entries by the best axis
-		long xmargin = 0;
+		double xmargin = 0;
 		Collections.sort(entries, Entry.CompareX);
-		
+
 		Node first = new Node(); Node second = new Node();
 		for (int i = 0; i < m-1; i++) {
 			first.add(entries.get(i));
@@ -156,16 +199,16 @@ public class RTree {
 		for (int i = m-1; i < M+1; i++) {
 			second.add(entries.get(i));
 		}
-		
+
 		for (int k = 0; k < M-2*m+2; k++) {
 			first.add(entries.get(m-1+k));
 			second.remove(0);
 			xmargin += first.margin() + second.margin();
 		}
-		
-		long ymargin = 0;
+
+		double ymargin = 0;
 		Collections.sort(entries, Entry.CompareY);
-		
+
 		first = new Node(); second = new Node();
 		for (int i = 0; i < m-1; i++) {
 			first.add(entries.get(i));
@@ -173,13 +216,13 @@ public class RTree {
 		for (int i = m-1; i < M+1; i++) {
 			second.add(entries.get(i));
 		}
-		
+
 		for (int k = 0; k < M-2*m+2; k++) {
 			first.add(entries.get(m-1+k));
 			second.remove(0);
 			ymargin += first.margin() + second.margin();
 		}
-		
+
 		if (xmargin < ymargin)
 			Collections.sort(entries, Entry.CompareX);		
 	}
@@ -195,7 +238,7 @@ public class RTree {
 				Entry enn = new Entry();
 				enn.child = nn;
 				enn.adjust();
-				if (p.size()<M) {
+				if (p.size() < M) {
 					p.add(enn);
 					nn = null;
 				}
@@ -253,7 +296,7 @@ public class RTree {
 		h = th-h;
 		n = R;
 		while (h!=0){
-			long s = -1;
+			double s = -1;
 			Node sn=null;
 			for (int a=0; a<n.size(); a++){
 				Entry k = n.get(a);
