@@ -1,6 +1,7 @@
 package minsk.tree;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class RTree {
 	public static final int M = 20;
@@ -8,6 +9,7 @@ public class RTree {
 	public Node R=null;
 	public int nodeCount = 0;
 	public int leafCount = 0;
+	public int compareCount = 0;
 	public int height = 0;
 	public int nodes = 0;
 
@@ -19,6 +21,7 @@ public class RTree {
 		for (int a=0; a<T.size(); a++){
 			e = T.get(a);
 			if (((!(xh<e.x.l || xl>e.x.h))) && (!(yl>e.y.h || yh<e.y.l))){
+				compareCount++;
 				if (T.isleaf){ // leaf
 					result.add(e);
 				}
@@ -41,6 +44,7 @@ public class RTree {
 		Node n = R;
 		while (!n.isleaf){
 			long mincost = Long.MAX_VALUE;
+			long s = -1, d;
 			Entry se = null;
 			if (n.get(0).child.isleaf) { // the childpointers in N point to leaves
 				for (int i=0; i < n.size(); i++)
@@ -51,16 +55,18 @@ public class RTree {
 						mincost = cost;
 						se = k;
 					} else if (mincost == cost) {
-						if (se.diffArea(e) > k.diffArea(e))
+						d = k.diffArea(e);
+						if (s < 0 || s > d) {
+							s = d;
 							se = k;
-						else if (se.diffArea(e) == k.diffArea(e)) {
+						}
+						else if (s == d) {
 							if (se.area() > k.area())
 								se = k;
 						}
 					}
 				}
 			} else {
-				long s = -1, d;
 				for (int i=0; i < n.size(); i++)
 				{
 					Entry k = n.get(i);
@@ -79,102 +85,105 @@ public class RTree {
 		}
 		return n;
 	}
-	private Entry[] pickSeeds(Node n){ // return the most wasteful pair of entries
-		Entry me1=null;
-		Entry me2=null;
-		long d = -1;
-		for (int i=0; i<n.size(); i++) {
-			for (int j=i+1; j<n.size(); j++){
-				Entry e1 = n.get(i);
-				Entry e2 = n.get(j);
-				Node l = new Node();
-				l.add(e1);
-				l.add(e2);
-				long k = l.area()-e1.area()-e2.area();
-				if (me1==null || d<k) {
-					me1 = e1; me2 = e2;
-					d = k;
-				}
-			}
-		}
-		Entry[] result = new Entry[2];
-		result[0] = me1;
-		result[1] = me2;
-		return result;
-	}
-	private Entry pickNext(ArrayList<Entry> remain, Node l1, Node l2){
-		long d =-1;
-		Entry k = null;
-		for (int i = 0; i<remain.size(); i++){
-			Entry e = remain.get(i);
-			long d1 = l1.diffArea(e);
-			long d2 = l2.diffArea(e);
-			if (d<Math.abs(d1-d2)){
-				d = Math.abs(d1-d2);
-				k = e;
-			}
-		}
-		return k;
-	}
+
 	private Node splitNode(Node n, Entry e){  // node n's split and inserted entry is e
 		Node nn = new Node(n.isleaf);
 		nodes++;
 		nn.parent = n.parent;
 		n.add(e);
-		Entry[] seeds = pickSeeds(n);
 		ArrayList<Entry> temp = n.entryList;
 		n.initEntries();
 		nn.initEntries();
-		long s1,s2,d1,d2;
-		n.add(seeds[0]);
-		if (!n.isleaf) seeds[0].child.parent = n;
-		nn.add(seeds[1]);
-		if (!n.isleaf) seeds[1].child.parent = nn;
-		temp.remove(seeds[0]);
-		temp.remove(seeds[1]);	
-		while (!temp.isEmpty()){
-			if (n.size() >= m && (nn.size()+temp.size() == m)){
-				Entry t = null;
-				while(!temp.isEmpty()){
-					t = (Entry)temp.remove(0);
-					nn.add(t);
-					if (!n.isleaf)	t.child.parent = nn;
-				}
-				break;
-			} 
-			if (nn.size() >= m && (n.size()+temp.size() == m)){
-				Entry t = null;
-				while(temp.size()!=0) {
-					t = (Entry) temp.remove(0);
-					n.add(t);
-					if (!n.isleaf) t.child.parent = n;
-				}
-				break;
-			}
-			Entry next = pickNext(temp, n, nn);
-			temp.remove(next);
-			s1 = n.area();
-			s2 = nn.area();
-			d1 = n.diffArea(next);
-			d2 = nn.diffArea(next);
-			int l1 = n.size();
-			if (d1>d2) nn.add(next);
-			else if (d1<d2) n.add(next);
-			else {
-				if (s1>s2) nn.add(next);
-				else if (s1<s2) n.add(next);
-				else {
-					if (n.size()<nn.size()) n.add(next);
-					else nn.add(next);
-				}
-			}
-			if (!n.isleaf) {
-				if (n.size()== l1) next.child.parent = nn;
-				else next.child.parent = n;
-			}
+
+		chooseSplitAxis(temp);
+		int k = chooseSplitIndex(temp);
+		
+		Entry t;
+		for (int i=0; i < m-1+k; i++) {
+			t = temp.get(i);
+			n.add(t);
+			if (!n.isleaf) t.child.parent = n;
 		}
+		for (int i=m-1+k; i < M+1; i++) {
+			t = temp.get(i);
+			nn.add(temp.get(i));
+			if (!n.isleaf) t.child.parent = nn;
+		}
+				
 		return nn;
 	}
+	private int chooseSplitIndex(ArrayList<Entry> entries) {
+		int index = -1;
+		long min = Long.MAX_VALUE, cost;
+		Node first = new Node(); Node second = new Node();
+		for (int i = 0; i < m-1; i++) {
+			first.add(entries.get(i));
+		}
+		for (int i = m-1; i < M+1; i++) {
+			second.add(entries.get(i));
+		}
+		
+		for (int k = 0; k < M-2*m+2; k++) {
+			first.add(entries.get(m-1+k));
+			second.remove(0);
+			cost = overlap(first, second);
+			if (min > cost) {
+				index = k;
+				min = cost;
+			}
+		}
+		return index;
+	}
+	private long overlap(Node n1, Node n2) {
+		int xl, xh, yl, yh;
+		
+		xl = Math.max(n1.x.l, n2.x.l);
+		xh = Math.min(n1.x.h, n2.x.h);
+		yl = Math.max(n1.y.l, n2.y.l);
+		yh = Math.min(n1.y.h, n2.y.h);
+		
+		if (xl > xh || yl > yh) return 0;
+		else return (xh-xl)*(yh-yl);
+	}
+	private void chooseSplitAxis(ArrayList<Entry> entries) { // sort entries by the best axis
+		long xmargin = 0;
+		Collections.sort(entries, Entry.CompareX);
+		
+		Node first = new Node(); Node second = new Node();
+		for (int i = 0; i < m-1; i++) {
+			first.add(entries.get(i));
+		}
+		for (int i = m-1; i < M+1; i++) {
+			second.add(entries.get(i));
+		}
+		
+		for (int k = 0; k < M-2*m+2; k++) {
+			first.add(entries.get(m-1+k));
+			second.remove(0);
+			xmargin += first.margin() + second.margin();
+		}
+		
+		long ymargin = 0;
+		Collections.sort(entries, Entry.CompareY);
+		
+		first = new Node(); second = new Node();
+		for (int i = 0; i < m-1; i++) {
+			first.add(entries.get(i));
+		}
+		for (int i = m-1; i < M+1; i++) {
+			second.add(entries.get(i));
+		}
+		
+		for (int k = 0; k < M-2*m+2; k++) {
+			first.add(entries.get(m-1+k));
+			second.remove(0);
+			ymargin += first.margin() + second.margin();
+		}
+		
+		if (xmargin < ymargin)
+			Collections.sort(entries, Entry.CompareX);		
+	}
+
 	private void adjustTree(Node l, Node ll){
 		Node n = l;
 		Node nn = ll;
@@ -224,7 +233,7 @@ public class RTree {
 		Node ll = null;
 		if (l.size() < M) l.add(e);
 		else ll = splitNode(l, e);
-		adjustTree(l,ll);
+		adjustTree(l, ll);
 	}
 
 	/* Delete */

@@ -94,6 +94,9 @@ public class Node {
 		return (x.h-x.l)*(y.h-y.l); 
 
 	}
+	public long margin(){
+		return 2*((x.h-x.l)+(y.h-y.l));
+	}
 	
 	public String toString() {
 		return "("+ this.x.l + "," + this.x.h + ")" + "("+ this.y.l + "," + this.y.h + ")";

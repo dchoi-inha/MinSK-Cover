@@ -64,9 +64,9 @@ public class treeSimulator {
 		RTree r = construct();
 		LinList linList = new LinList(construct_array());
 		int xl, xh, yl, yh;
-		int size = 500000000;
+		int size = 50000;
 		long measurement = 10000;
-		long s1 = 0, s2 = 0, s3 = 0,s4 = 0, s5 = 0;
+		long s1 = 0, s2 = 0, s3 = 0,s4 = 0, s5 = 0, s6 = 0;
 		long cpuTimeElapsed;
 		/* test begins */
 		System.out.println("\nTest is started with (" + size + " X " + size + ", " + measurement + " times)"); 
@@ -75,17 +75,14 @@ public class treeSimulator {
 			yl = (int) (Math.random()*1000000000);
 			xh = xl+size;
 			yh = yl+size;
-//			System.out.print("Test "+xl+" "+xh+" "+yl+" "+yh+"begins\n");
-//			System.out.print("Normal Search Start\n");
-//			ArrayList<Entry> list = new ArrayList<Entry>(l);
+
 			cpuTimeElapsed = System.nanoTime();
 			ArrayList<Entry> result1 = linList.search(xl, xh, yl, yh);
 			cpuTimeElapsed = System.nanoTime()-cpuTimeElapsed;
 
 			
 			s1 += cpuTimeElapsed;
-//			System.out.print("\nNormal Search takes "+cpuTimeElapsed+" ns End\n");
-//			System.out.print("Index Search Start\n");
+
 			cpuTimeElapsed = System.nanoTime();
 			ArrayList<Entry> result2 = r.search(xl, xh, yl, yh);
 			cpuTimeElapsed = System.nanoTime()-cpuTimeElapsed;
@@ -101,16 +98,16 @@ public class treeSimulator {
 				}				
 				System.out.print("total: "+(result2.size())+"\n"); 
 			}
-//			System.out.print("nonleaf node: "+r.nodeCount+" leaf node: "+r.leafCount+"\n");
-			s3 += r.nodeCount; 	s4 += r.leafCount; s5 += result1.size();
+			s3 += r.nodeCount; 	s4 += r.leafCount; s5 += result1.size(); s6 += r.compareCount;
 
 			s2 += cpuTimeElapsed;
-//			System.out.print("Index Search takes "+cpuTimeElapsed+" ns End\n");
 		}
 		System.out.print("Normal search avg. "+s1/measurement+" ns Index search avg. "+s2/measurement+" ns\n");
 		System.out.print("List node access " + linList.size()/RTree.M + "\n");
 		System.out.print("Nonleaf access avg. "+s3/measurement+" Leaf access avg. "+s4/measurement+"\n");
 		System.out.print("Num of result avg. "+(double)s5/(double)measurement+ "\n");
+		System.out.print("Num of comparisons avg. "+(double)s6/(double)measurement+ "\n");
+
 	}
 	
 }

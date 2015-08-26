@@ -1,5 +1,7 @@
 package minsk.tree;
 
+import java.util.Comparator;
+
 import minsk.Env;
 
 
@@ -65,4 +67,17 @@ public class Entry {
 	{
 		return "("+ this.x.l + "," + this.x.h + ")" + "("+ this.y.l + "," + this.y.h + ")";
 	}
+	
+	public static Comparator<Entry> CompareX = new Comparator<Entry>() {
+		public int compare(Entry e1, Entry e2) {
+			if (e1.x.l == e2.x.l) return e1.x.h - e2.x.h;
+			else return e1.x.l - e2.x.l;
+		}
+	};
+	public static Comparator<Entry> CompareY = new Comparator<Entry>() {
+		public int compare(Entry e1, Entry e2) {
+			if (e1.y.l == e2.y.l) return e1.y.h - e2.y.h;
+			else return e1.y.l - e2.y.l;
+		}
+	};
 }
