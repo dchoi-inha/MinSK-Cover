@@ -24,7 +24,16 @@ public class Main {
 		try {
 			RTree rt = new RTree();
 			InvertedFile docidx = new InvertedFile();
-			construct("UK.txt", rt, docidx);
+			construct("4SQNY.txt", rt, docidx);
+			
+			for (String t: docidx.keywords()) {
+				System.out.print(t+"\n");
+				for (STObject o: docidx.get(t)) {
+					System.out.println(o);
+				}
+				System.out.println();
+			}
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

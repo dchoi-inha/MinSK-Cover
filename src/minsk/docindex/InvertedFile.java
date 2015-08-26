@@ -1,6 +1,7 @@
 package minsk.docindex;
 
 import java.util.HashMap;
+import java.util.Set;
 import java.util.TreeSet;
 
 import minsk.structure.STObject;
@@ -26,6 +27,10 @@ public class InvertedFile {
 			}
 			postings.add(o);
 		}
+	}
+		
+	public Set<String> keywords() {
+		return map.keySet();
 	}
 	
 	public int size() {
