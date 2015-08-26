@@ -1,10 +1,10 @@
-package minsk.rtree;
+package minsk.structure;
 
 
 public class Point implements Comparable<Point> {
 		
-	protected double x; 
-	protected double y;
+	public double x; 
+	public double y;
 	
 	public Point ( int x, int y ) {
 		this.x = x;

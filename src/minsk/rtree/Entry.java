@@ -3,6 +3,7 @@ package minsk.rtree;
 import java.util.Comparator;
 
 import minsk.Env;
+import minsk.structure.Point;
 import minsk.util.Debug;
 
 

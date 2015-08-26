@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.PriorityQueue;
 
+import minsk.structure.Point;
+
 public class RTree {
 	public static final int M = 20;
 	public static final int m = 10;
@@ -12,6 +14,15 @@ public class RTree {
 	public int leafCount = 0;
 	public int height = 0;
 	public int nodes = 0;
+	
+	public RTree() {
+		if (R==null){
+			Node n = new Node(true);
+			nodes++;
+			R = n;
+			height++;
+		}
+	}
 
 	/* Search */
 	private void _search(Node T, double xl, double xh, double yl, double yh, ArrayList<Entry> result){
@@ -264,14 +275,6 @@ public class RTree {
 		}
 	}
 	public void insert(Entry e){
-		if (R==null){
-			Node n = new Node(true);
-			nodes++;
-			R = n;
-			n.add(e);
-			height++;
-			return;
-		}
 		Node l = chooseLeaf(e);
 		Node ll = null;
 		if (l.size() < M) l.add(e);

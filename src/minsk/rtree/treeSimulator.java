@@ -6,6 +6,8 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
 
+import minsk.structure.Point;
+
 public class treeSimulator {
 	private static String filename = "toy.txt";
 	public static long getCpuTime() {
