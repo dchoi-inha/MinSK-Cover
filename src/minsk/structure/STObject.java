@@ -49,9 +49,9 @@ public class STObject {
 
 	public String toString()
 	{
-		return loc.toString() ;
+//		return loc.toString() ;
 
-//		return loc.toString() + " " + text.toString();
+		return loc.toString() + " " + text.toString();
 	}
 	
 	public static Comparator<STObject> CompareLoc = new Comparator<STObject>() {

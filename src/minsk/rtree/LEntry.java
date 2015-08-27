@@ -10,7 +10,7 @@ import minsk.structure.STObject;
  */
 public class LEntry extends Entry {
 
-	STObject obj;
+	public STObject obj;
 	
 	public LEntry(double xl, double xh, double yl, double yh, STObject o) {
 		super(xl, xh, yl, yh);

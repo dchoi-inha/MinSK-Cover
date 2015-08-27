@@ -4,12 +4,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import minsk.structure.Point;
 import minsk.structure.STObject;
 
 import minsk.docindex.InvertedFile;
+import minsk.rtree.Entry;
 import minsk.rtree.LEntry;
 import minsk.rtree.RTree;
 
@@ -24,15 +27,25 @@ public class Main {
 		try {
 			RTree rt = new RTree();
 			InvertedFile docidx = new InvertedFile();
-			construct("4SQNY.txt", rt, docidx);
+			construct("toy.txt", rt, docidx);
 			
-			for (String t: docidx.keywords()) {
-				System.out.print(t+"\n");
-				for (STObject o: docidx.get(t)) {
-					System.out.println(o);
+			int k = 4;
+			for (int i = 0; i<1; i++){
+				double x = Math.random();
+				double y = Math.random();
+
+				Point q = new Point(0.457366882599,	0.504832534707);
+				System.out.println("q:" + q);
+
+
+				ArrayList<Entry> list1 = rt.kNNSearch(q, k);
+				
+				for (Entry e: list1) {
+					System.out.println(((LEntry) e).obj);
 				}
-				System.out.println();
+
 			}
+
 			
 		} catch (IOException e) {
 			e.printStackTrace();
