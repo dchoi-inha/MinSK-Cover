@@ -56,6 +56,7 @@ public class treeSimulator {
 		long measurement = 10000;
 		int k = 3;
 		long s1 = 0, s2 = 0, s3 = 0,s4 = 0, s5 = 0;
+
 		long cpuTimeElapsed;
 		/* test begins */
 		System.out.println("\nTest is started with (" + size + " X " + size + ", " + measurement + " times)"); 
@@ -94,37 +95,12 @@ public class treeSimulator {
 
 			s2 += cpuTimeElapsed;
 
-
-			//			cpuTimeElapsed = System.nanoTime();
-			//			ArrayList<Entry> result1 = linList.rangeSearch(xl, xh, yl, yh);
-			//			cpuTimeElapsed = System.nanoTime()-cpuTimeElapsed;
-			//
-			//			
-			//			s1 += cpuTimeElapsed;
-			//
-			//			cpuTimeElapsed = System.nanoTime();
-			//			ArrayList<Entry> result2 = r.rangeSearch(xl, xh, yl, yh);
-			//			cpuTimeElapsed = System.nanoTime()-cpuTimeElapsed;
-			//			
-			//			if (result1.size() != result2.size()) {
-			//				System.out.println("Error!!!!");
-			//				for (Entry e: result1) {
-			//					System.out.println("Search x: "+e.x.l+" "+e.x.h+ ", y: "+e.y.l+" "+e.y.h);
-			//				}				
-			//				System.out.print("total: "+(result1.size())+"\n"); 
-			//				for (Entry e: result2) {
-			//					System.out.println("Search x: "+e.x.l+" "+e.x.h+ ", y: "+e.y.l+" "+e.y.h);
-			//				}				
-			//				System.out.print("total: "+(result2.size())+"\n"); 
-			//			}
-			//			s3 += r.nodeCount; 	s4 += r.leafCount; s5 += result1.size();
-			//
-			//			s2 += cpuTimeElapsed;
 		}
 		System.out.print("Normal search avg. "+s1/measurement+" ns Index search avg. "+s2/measurement+" ns\n");
 		System.out.print("List node access " + linList.size()/RTree.M + "\n");
 		System.out.print("Nonleaf access avg. "+s3/measurement+" Leaf access avg. "+s4/measurement+"\n");
 		System.out.print("Num of result avg. "+(double)s5/(double)measurement+ "\n");
+
 
 	}
 

@@ -10,6 +10,7 @@ public class RTree {
 	public Node R=null;
 	public int nodeCount = 0;
 	public int leafCount = 0;
+	public int compareCount = 0;
 	public int height = 0;
 	public int nodes = 0;
 
@@ -21,6 +22,7 @@ public class RTree {
 		for (int a=0; a<T.size(); a++){
 			e = T.get(a);
 			if (((!(xh<e.x.l || xl>e.x.h))) && (!(yl>e.y.h || yh<e.y.l))){
+				compareCount++;
 				if (T.isleaf){ // leaf
 					result.add(e);
 				}
