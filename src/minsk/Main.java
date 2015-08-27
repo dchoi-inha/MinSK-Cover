@@ -11,7 +11,6 @@ import java.util.HashSet;
 import minsk.structure.Point;
 import minsk.structure.STObject;
 
-import minsk.brtree.BRTree;
 import minsk.docindex.InvertedFile;
 import minsk.rtree.Entry;
 import minsk.rtree.LEntry;
@@ -26,16 +25,16 @@ public class Main {
 
 	public static void main(String[] args) {
 		try {
-			BRTree rt = new BRTree();
+			RTree rt = new RTree();
 			InvertedFile docidx = new InvertedFile();
-			construct("toy.txt", rt, docidx);
+			construct("UK.txt", rt, docidx);
 			
 			int k = 4;
 			for (int i = 0; i<1; i++){
 				double x = Math.random();
 				double y = Math.random();
 
-				Point q = new Point(0.457366882599,	0.504832534707);
+				Point q = new Point(x,	y);
 				System.out.println("q:" + q);
 
 
@@ -55,9 +54,7 @@ public class Main {
 
 	public static void construct (String filename, RTree R, InvertedFile L) throws IOException{
 		BufferedReader in = new BufferedReader(new FileReader(new File(filename)));
-		String s;
-		String[] array;
-		int count = 1;  
+ 		int count = 1;  
 		System.out.print("Insertion Start\n");
 		
 		final HashSet<String> symbols = new HashSet<String>();
@@ -86,8 +83,7 @@ public class Main {
 				text.add(tag.trim());
 			}
 			STObject obj = new STObject(x, y, text);
-			LEntry e = new LEntry(x,x,y,y, obj);
-			R.insert(e);
+			R.insert(obj);
 			L.add(obj);
 			count ++; 
 		}
@@ -95,7 +91,7 @@ public class Main {
 		System.out.print("Insertion End\n");
 		in.close();
 		
-		System.out.print("objects: " + count + " nodes: "+R.nodes+" heights: "+R.height+ "\n");
+		System.out.print("M: " + RTree.M + " m: " + RTree.m + " objects: " + count + " nodes: "+R.nodes+" heights: "+R.height+ "\n");
 		System.out.print("keywords: " + L.size() + "\n");
 
 	}

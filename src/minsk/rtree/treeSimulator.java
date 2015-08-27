@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import minsk.structure.Point;
 
 public class treeSimulator {
-	private static String filename = "toy.txt";
+	private static String filename = "UK.txt";
 	public static long getCpuTime() {
 		ThreadMXBean bean = ManagementFactory.getThreadMXBean();
 		return bean.isCurrentThreadCpuTimeSupported()?
@@ -54,8 +54,8 @@ public class treeSimulator {
 		LinList linList = new LinList(construct_array());
 		double xl, xh, yl, yh;
 		double size = 0.01;
-		long measurement = 10000;
-		int k = 5;
+		long measurement = 1000;
+		int k = 3;
 		long s1 = 0, s2 = 0, s3 = 0,s4 = 0, s5 = 0;
 		long cpuTimeElapsed;
 		/* test begins */

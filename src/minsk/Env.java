@@ -1,7 +1,6 @@
 package minsk;
 
 
-import java.util.HashMap;
 
 /**
  * @author Dong-Wan Choi
@@ -13,5 +12,6 @@ public class Env {
 	
 	public static double MaxCoord = 1.0;
 	
+	public static final int B = 1024; // bytes
 
 }

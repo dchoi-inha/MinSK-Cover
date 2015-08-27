@@ -107,14 +107,16 @@ public class Entry {
 	
 	public static Comparator<Entry> CompareX = new Comparator<Entry>() {
 		public int compare(Entry e1, Entry e2) {
-			if (e1.x.l == e2.x.l) return (e1.x.h - e2.x.h >= 0? 1 : -1);
-			else return (e1.x.l - e2.x.l>=0? 1: -1);
+			if (e1.x.l == e2.x.l && e1.x.h != e2.x.h) return (e1.x.h - e2.x.h > 0? 1 : -1);
+			else if (e1.x.l != e2.x.l) return (e1.x.l - e2.x.l > 0? 1: -1);
+			else return 0;
 		}
 	};
 	public static Comparator<Entry> CompareY = new Comparator<Entry>() {
 		public int compare(Entry e1, Entry e2) {
-			if (e1.y.l == e2.y.l) return (e1.y.h - e2.y.h >= 0? 1 : -1);
-			else return (e1.y.l - e2.y.l>=0? 1: -1);
+			if (e1.y.l == e2.y.l && e1.y.h != e2.y.h) return (e1.y.h - e2.y.h > 0? 1 : -1);
+			else if (e1.y.l != e2.y.l) return (e1.y.l - e2.y.l > 0? 1: -1);
+			else return 0;
 		}
 	};
 	public static Comparator<Entry> CompareDist = new Comparator<Entry>() {
@@ -122,4 +124,6 @@ public class Entry {
 			return (e1.dist > e2.dist ? 1: -1);
 		}
 	};
+	
+	public static int size = 8*4+4; // double * 4 + integer * 1
 }

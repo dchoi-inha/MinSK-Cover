@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.PriorityQueue;
 
+import minsk.Env;
 import minsk.structure.Point;
+import minsk.structure.STObject;
 
 public class RTree {
-	public static final int M = 20;
-	public static final int m = 10;
+	public static final int M = (int) Math.floor(Env.B/Entry.size);
+	public static final int m = (int) Math.floor(M * 0.5);
 	public Node R=null;
 	public int nodeCount = 0;
 	public int leafCount = 0;
@@ -280,6 +282,11 @@ public class RTree {
 		if (l.size() < M) l.add(e);
 		else ll = splitNode(l, e);
 		adjustTree(l, ll);
+	}
+	public void insert(STObject o){
+		Point p = o.loc;
+		LEntry e = new LEntry(p.x, p.x, p.y, p.y, o);
+		insert(e);
 	}
 
 	/* Delete */
