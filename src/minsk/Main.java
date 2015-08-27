@@ -11,6 +11,7 @@ import java.util.HashSet;
 import minsk.structure.Point;
 import minsk.structure.STObject;
 
+import minsk.brtree.BRTree;
 import minsk.docindex.InvertedFile;
 import minsk.rtree.Entry;
 import minsk.rtree.LEntry;
@@ -25,7 +26,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		try {
-			RTree rt = new RTree();
+			BRTree rt = new BRTree();
 			InvertedFile docidx = new InvertedFile();
 			construct("toy.txt", rt, docidx);
 			
