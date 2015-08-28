@@ -1,5 +1,8 @@
 package minsk;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 
 
 /**
@@ -14,4 +17,5 @@ public class Env {
 	
 	public static final int B = 1024; // bytes
 
+	public static Words W = new Words();
 }

@@ -3,7 +3,10 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.HashSet;
 
 
 /**
@@ -34,7 +37,28 @@ public class Util {
 		
 		return today;
 	}
-
+	
+	public static Bitmap getBitmap(HashSet<String> text, int len, HashMap<String, Integer> indices) {
+		Bitmap bmp = new Bitmap(len);
+		for (String t: text) {
+			bmp.set(indices.get(t));
+		}
+		
+		return bmp;
+	}
+	
+	public static ArrayList<String> getText(Bitmap bmp, ArrayList<String> words) {
+		ArrayList<String> text = new ArrayList<String>();
+		
+		for(int i=0; i < bmp.size(); i++)
+		{
+			if (bmp.get(i))
+				text.add(words.get(i));
+		}
+		
+		return text;
+	}
+	
 	
 	public static long getCpuTime() {
 		ThreadMXBean bean = ManagementFactory.getThreadMXBean();

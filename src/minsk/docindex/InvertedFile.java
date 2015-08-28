@@ -13,7 +13,7 @@ public class InvertedFile {
 		map = new HashMap<String, TreeSet<STObject>>();
 	}
 	
-	public TreeSet<STObject> get(String t) {
+	public TreeSet<STObject> getList(String t) {
 		return map.get(t);
 	}
 	
