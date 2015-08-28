@@ -8,7 +8,7 @@ import minsk.Env;
  */
 
 /**
- * @author Dongwan Choi
+ * @author Dong-Wan Choi
  * @date 2011. 12. 5.
  * @date 2013. 12. 24 updated to write logs in the DEBUG mode
  */

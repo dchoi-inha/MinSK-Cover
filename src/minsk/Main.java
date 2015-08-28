@@ -80,7 +80,7 @@ public class Main {
 
 				String match = "[^\uAC00-\uD7A3xfe0-9a-zA-Z\\s]";
 				tag = tag.replaceAll(match, "");
-				text.add(tag.trim());
+				text.add(tag.trim()); 
 			}
 			STObject obj = new STObject(x, y, text);
 			R.insert(obj);
