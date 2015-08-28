@@ -8,9 +8,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import minsk.structure.Dataset;
 import minsk.structure.Point;
 import minsk.structure.STObject;
+import minsk.util.Bitmap;
+import minsk.util.Util;
 
+import minsk.brtree.BRTree;
 import minsk.docindex.InvertedFile;
 import minsk.rtree.Entry;
 import minsk.rtree.LEntry;
@@ -25,9 +29,36 @@ public class Main {
 
 	public static void main(String[] args) {
 		try {
+			Env.W = new Words();
+			Dataset db = construct("UK.txt");
+			
 			RTree rt = new RTree();
+			BRTree brt = new BRTree();
 			InvertedFile docidx = new InvertedFile();
-			construct("UK.txt", rt, docidx);
+
+			for (STObject o: db) {
+				rt.insert(o);
+				brt.insert(o);
+				docidx.add(o);
+			}
+			
+
+			
+			Bitmap ab = new Bitmap(Env.W.size());
+			ab.setAll();
+			System.out.println(ab);
+//			for (String t: Util.getText(ab, Env.W.words)) {
+//				System.out.print(t);
+//			}
+			System.out.println();
+			System.out.println(brt.R.bmp);
+//			for (String t: Util.getText(brt.R.bmp, Env.W.words)) {
+//				System.out.print(t);
+//			}
+			System.out.println("\n");
+			
+			System.out.print("M: " + RTree.M + " m: " + RTree.m + " objects: " + db.size() + " nodes: "+rt.nodes+" heights: "+rt.height+ "\n");
+			System.out.print("keywords: " + Env.W.size() + "\n");
 			
 			int k = 4;
 			for (int i = 0; i<1; i++){
@@ -52,10 +83,11 @@ public class Main {
 		}
 	}
 
-	public static void construct (String filename, RTree R, InvertedFile L) throws IOException{
+	public static Dataset construct (String filename) throws IOException{
+		Dataset db = new Dataset();
 		BufferedReader in = new BufferedReader(new FileReader(new File(filename)));
  		int count = 1;  
-		System.out.print("Insertion Start\n");
+		System.out.print("DB Load Start\n");
 		
 		final HashSet<String> symbols = new HashSet<String>();
 		String[] spChars = {
@@ -83,16 +115,16 @@ public class Main {
 				text.add(tag.trim()); 
 			}
 			STObject obj = new STObject(x, y, text);
-			R.insert(obj);
-			L.add(obj);
+			db.add(obj);		
+			Env.W.add(obj);
+			
 			count ++; 
 		}
 		
-		System.out.print("Insertion End\n");
+		System.out.print("DB Load End\n");
 		in.close();
 		
-		System.out.print("M: " + RTree.M + " m: " + RTree.m + " objects: " + count + " nodes: "+R.nodes+" heights: "+R.height+ "\n");
-		System.out.print("keywords: " + L.size() + "\n");
+		return db;
 
 	}
 }

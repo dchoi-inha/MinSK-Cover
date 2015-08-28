@@ -10,13 +10,22 @@ public class Bitmap {
 	private int len;
 	
 	public Bitmap(int len) {
-		bits = new byte[(len/Byte.SIZE)+(len%Byte.SIZE)];
+		int index = (int) Math.ceil((double)len/(double)Byte.SIZE);
+		bits = new byte[index];
 		this.len = len;
 	}
 	
 	public Bitmap(byte[] bits) {
 		this.bits = bits;
 		this.len = bits.length * Byte.SIZE;
+	}
+	
+	public Bitmap(Bitmap b) {
+		len = b.len;
+		int index = (int) Math.ceil((double)len/(double)Byte.SIZE);
+		bits =  new byte[index];
+		for ( int i = 0; i < index; i++ )
+			bits[i] = (byte) b.bits[i];
 	}
 	
 	public void set(int pos) {
@@ -46,12 +55,27 @@ public class Bitmap {
 	}
 	
 	public void setAll() {
+		
 		for ( int i = 0; i < len/Byte.SIZE; i++ )
 			bits[i] = (byte)0xff;
 		if ( len%Byte.SIZE > 0 ) {
 			for (int pos = (len/Byte.SIZE)*Byte.SIZE; pos < len; pos++)
 				set(pos);
 		}
+	}
+	
+	public void and(Bitmap bmp) {
+
+	}
+
+	public void or(Bitmap bmp) {
+		if (len != bmp.len) {
+			Debug._Error(this, "or cannot be done for bitmaps of different lengths");
+		}
+		int index = (int) Math.ceil((double)len/(double)Byte.SIZE);
+
+		for ( int i = 0; i < index; i++ )
+			bits[i] = (byte) (bits[i] | bmp.bits[i]);
 	}
 	
 	public byte[] toByteArray() {
@@ -74,6 +98,15 @@ public class Bitmap {
 	
 	public int size() {
 		return len;
+	}
+	
+	public String toString() {
+		String s="";
+		for (int i=len-1; i >= 0; i--) {
+			if (get(i)) s += "1";
+			else s+= "0";
+		}
+		return s;
 	}
 }
 
