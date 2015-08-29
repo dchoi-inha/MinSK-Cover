@@ -6,6 +6,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.util.ArrayList;
 
+import minsk.Env;
 import minsk.structure.Point;
 
 public class BrtreeSimulator {
@@ -19,7 +20,7 @@ public class BrtreeSimulator {
 		BufferedReader in = new BufferedReader(new FileReader(new File(filename)));
 		String s;
 		String[] array;
-		BRTree R = new BRTree();
+		BRTree R = new BRTree(Env.W);
 		int count = 1;  
 		System.out.print("Insertion Start\n");
 		while ((s=in.readLine())!=null){

@@ -1,8 +1,10 @@
 package minsk.brtree;
 
 import java.util.Comparator;
+import java.util.HashSet;
 
 import minsk.Env;
+import minsk.Words;
 import minsk.rtree.Pair;
 import minsk.structure.Point;
 import minsk.util.Debug;
@@ -27,6 +29,14 @@ public class BEntry {
 		x.h = xh;
 		y.l = yl;
 		y.h = yh;
+	}
+	
+	public boolean intersect(HashSet<String> T, Words w) {
+		return child.bmp.intersect(w.getBitmap(T));
+	}
+	
+	public boolean contains(String t, Words w) {
+		return child.bmp.get(w.getIdx(t));
 	}
 	
 	public boolean contains(Point p) {

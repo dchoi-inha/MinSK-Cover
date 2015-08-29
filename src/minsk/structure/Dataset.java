@@ -5,6 +5,9 @@ package minsk.structure;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+
+import minsk.brtree.BEntry;
 
 /**
  * @author Dong-Wan Choi
@@ -15,19 +18,18 @@ public class Dataset extends ArrayList<STObject>{
 	{
 		super(); 
 	}
-
-	public Dataset(Point [] points)
-	{
-		super();
-		super.clear();
-		for (Point p: points)
-			super.add(new STObject(p.getX(), p.getY()));
+	
+	public Dataset(Collection<? extends STObject> c) {
+		super(c);
 	}
+
 	
 	public Dataset(STObject [] objs)
 	{
 		super();
 		super.addAll(Arrays.asList(objs));
 	}
+	
+	
 	private static final long serialVersionUID = 1L;
 }

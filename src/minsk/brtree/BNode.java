@@ -3,6 +3,7 @@ package minsk.brtree;
 import java.util.ArrayList;
 
 import minsk.Env;
+import minsk.Words;
 import minsk.rtree.Pair;
 import minsk.structure.STObject;
 import minsk.util.Bitmap;
@@ -46,20 +47,8 @@ public class BNode {
 	}
 	public void add(BEntry e){
 		entryList.add(e);
-		
-		if (e instanceof BLEntry) { // data entry
-			STObject o = ((BLEntry)e).obj;
-			Bitmap tbmp = Env.W.getBitmap(o.text);
-			if (bmp == null ) bmp = new Bitmap(tbmp);
-			else bmp.or(tbmp);
-		} else {
-			BNode tnode = e.child;
-			if (bmp == null) bmp = new Bitmap(tnode.bmp);
-			else bmp.or(tnode.bmp);
-		}
-		
 		updateMBR(e);
-		
+		updateBitmap(e, BRTree.W);
 	}
 	private void updateMBR(BEntry e) {
 		x.l = Math.min(x.l, e.x.l);
@@ -67,10 +56,12 @@ public class BNode {
 		y.l = Math.min(y.l, e.y.l);
 		y.h = Math.max(y.h, e.y.h);
 	}
-	public void updateBMP(BLEntry le) {
-		STObject o = le.obj;
-		Bitmap tbmp = Env.W.getBitmap(o.text);
-		if (bmp == null ) bmp = new Bitmap(tbmp);
+	public void updateBitmap(BEntry e, Words w) {
+		Bitmap tbmp;
+		if (e instanceof BLEntry) tbmp = w.getBitmap(((BLEntry)e).obj.text);
+		else tbmp = e.child.bmp;
+		
+		if (bmp == null) bmp = new Bitmap(tbmp);
 		else bmp.or(tbmp);
 	}
 	public void remove(BEntry e){

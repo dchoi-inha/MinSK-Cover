@@ -1,5 +1,8 @@
 package minsk.brtree;
 
+import java.util.HashSet;
+
+import minsk.Words;
 import minsk.structure.STObject;
 
 /**
@@ -16,5 +19,14 @@ public class BLEntry extends BEntry {
 		super(xl, xh, yl, yh);
 		obj = o;
 	}
-
+	
+	public boolean contains(String t, Words w) {
+		return obj.text.contains(t);
+	}
+	
+	public boolean intersect(HashSet<String> T, Words w) {
+		HashSet<String> tmp = new HashSet<String>(T);
+		tmp.retainAll(obj.text); // intersection T and Object's text
+		return (!tmp.isEmpty());
+	}
 }

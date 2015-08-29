@@ -64,13 +64,33 @@ public class Bitmap {
 		}
 	}
 	
-	public void and(Bitmap bmp) {
+	public boolean intersect(Bitmap bmp) {
+		Bitmap tmp = new Bitmap(this);
+		tmp.and(bmp);
+		int index = (int) Math.ceil((double)len/(double)Byte.SIZE);
 
+		for (int i=0; i < index; i++) {
+			if (bits[i] != (byte)0x00)
+				return true;
+		}
+		return false;
+	}
+	
+	public void and(Bitmap bmp) {
+		if (len != bmp.len) {
+			Debug._Error(this, "AND cannot be done for bitmaps of different lengths");
+			System.exit(0);
+		}
+		int index = (int) Math.ceil((double)len/(double)Byte.SIZE);
+
+		for ( int i = 0; i < index; i++ )
+			bits[i] = (byte) (bits[i] & bmp.bits[i]);
 	}
 
 	public void or(Bitmap bmp) {
 		if (len != bmp.len) {
-			Debug._Error(this, "or cannot be done for bitmaps of different lengths");
+			Debug._Error(this, "OR cannot be done for bitmaps of different lengths");
+			System.exit(0);
 		}
 		int index = (int) Math.ceil((double)len/(double)Byte.SIZE);
 

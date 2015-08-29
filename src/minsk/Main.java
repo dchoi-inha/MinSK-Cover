@@ -8,17 +8,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
-import minsk.structure.Dataset;
-import minsk.structure.Point;
-import minsk.structure.STObject;
-import minsk.util.Bitmap;
+import minsk.structure.*;
 import minsk.util.Util;
-
-import minsk.brtree.BRTree;
-import minsk.docindex.InvertedFile;
-import minsk.rtree.Entry;
-import minsk.rtree.LEntry;
-import minsk.rtree.RTree;
+import minsk.brtree.*;
+import minsk.docindex.*;
+import minsk.rtree.*;
 
 /**
  * Main
@@ -30,51 +24,71 @@ public class Main {
 	public static void main(String[] args) {
 		try {
 			Env.W = new Words();
-			Dataset db = construct("toy2.txt");
+			Dataset db = construct("UK.txt");
 			
 			RTree rt = new RTree();
-			BRTree brt = new BRTree();
-			InvertedFile docidx = new InvertedFile();
+			BRTree brt = new BRTree(Env.W);
+			InvertedFile iv = new InvertedFile();
+			LinList list = new LinList();
 
+			System.out.println("Indexing Start");
 			for (STObject o: db) {
-				rt.insert(o);
+//				rt.insert(o);
 				brt.insert(o);
-				docidx.add(o);
+				iv.add(o);
+				list.add(o);
 			}
-			
-
-			
-			Bitmap ab = new Bitmap(Env.W.size());
-			ab.setAll();
-			System.out.println(ab);
-//			for (String t: Util.getText(ab, Env.W.words)) {
-//				System.out.print(t);
-//			}
-			System.out.println();
-			System.out.println(brt.R.bmp);
-//			for (String t: Util.getText(brt.R.bmp, Env.W.words)) {
-//				System.out.print(t);
-//			}
-			System.out.println("\n");
+			System.out.println("Indexing End");
 			
 			System.out.print("M: " + RTree.M + " m: " + RTree.m + " objects: " + db.size() + " nodes: "+rt.nodes+" heights: "+rt.height+ "\n");
 			System.out.print("keywords: " + Env.W.size() + "\n");
 			
-			int k = 4;
-			for (int i = 0; i<1; i++){
+			long s1 = 0, s2 = 0, s3 = 0;
+			long cpuTimeElapsed;
+			
+			int k = 1, l = 4;
+			for (int i = 0; i<100; i++){
+				// generate random query
 				double x = Math.random();
 				double y = Math.random();
-
 				Point q = new Point(x,	y);
-				System.out.println("q:" + q);
+				HashSet<String> T = Env.W.rand(l);
+				System.out.println("q:" + q + "  T:" + T);
 
-
-				ArrayList<Entry> list1 = rt.kNNSearch(q, k);
-				
-				for (Entry e: list1) {
-					System.out.println(((LEntry) e).obj);
+				cpuTimeElapsed = Util.getCpuTime();
+				for (String t: T) {
+					BLEntry e = (BLEntry)list.nextNN(q, t, Env.W);
+					System.out.println(e.obj);
 				}
+				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
+				System.out.println("------------------------------" + cpuTimeElapsed);
+				
+				cpuTimeElapsed = Util.getCpuTime();
+				ArrayList<BEntry> result1 = brt.textNNSearch(q, T, Env.W);
+				for (BEntry e: result1) {
+					System.out.println(((BLEntry)e).obj);
+				}
+				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
+				System.out.println("------------------------------" + cpuTimeElapsed);
 
+				cpuTimeElapsed = Util.getCpuTime();
+				Dataset fdb = iv.dataset(T);
+				Words w = new Words(T);
+				BRTree fbrt = new BRTree(w);
+				for (STObject o: fdb) {
+					fbrt.insert(o);
+				}
+				ArrayList<BEntry> result2 = fbrt.textNNSearch(q, T, w);
+				for (BEntry e: result2) {
+					System.out.println(((BLEntry)e).obj);
+				}
+				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
+				System.out.println("------------------------------" + cpuTimeElapsed);
+
+
+
+				
+				System.out.println("\n");
 			}
 
 			
@@ -112,9 +126,10 @@ public class Main {
 
 				String match = "[^\uAC00-\uD7A3xfe0-9a-zA-Z\\s]";
 				tag = tag.replaceAll(match, "");
-				text.add(tag.trim()); 
+				if (!"".equals(tag.trim()))
+					text.add(tag.trim()); 
 			}
-			STObject obj = new STObject(x, y, text);
+			STObject obj = new STObject(count, x, y, text);
 			db.add(obj);		
 			Env.W.add(obj);
 			

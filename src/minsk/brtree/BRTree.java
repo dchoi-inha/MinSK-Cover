@@ -2,9 +2,11 @@ package minsk.brtree;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.PriorityQueue;
 
 import minsk.Env;
+import minsk.Words;
 import minsk.structure.Point;
 import minsk.structure.STObject;
 
@@ -16,19 +18,21 @@ import minsk.structure.STObject;
 public class BRTree {
 	public static final int M = (int) Math.floor(Env.B/BEntry.size);
 	public static final int m = (int) Math.floor(M * 0.5);
+	public static Words W;
 	public BNode R=null;
 	public int nodeCount = 0;
 	public int leafCount = 0;
 	public int height = 0;
 	public int nodes = 0;
 	
-	public BRTree() {
+	public BRTree(Words words) {
 		if (R==null){
 			BNode n = new BNode(true);
 			nodes++;
 			R = n;
 			height++;
 		}
+		W = words;
 	}
 
 	/* Search */
@@ -54,11 +58,105 @@ public class BRTree {
 
 		return result;
 	}
+	
+	public BEntry nextNN(Point q, String t, Words w, PriorityQueue<BEntry> pq) {
+		if (pq == null) {
+			pq = new PriorityQueue<BEntry>(11, BEntry.CompareDist);
+			for(int i = 0; i < R.size(); i++) {
+				BEntry e = R.get(i);
+				if (e.contains(t, w)) {
+					e.dist = e.distTo(q);
+					pq.add(e);
+				}
+			}
+		}
+		BEntry next;
+		while ((next=pq.poll()) != null)
+		{
+			if (next instanceof BLEntry) {// point
+				if (next.contains(t, w))
+					break;
+			}
+			else {
+				for(int i = 0; i < next.child.size(); i++) { // node
+					BEntry e = next.child.get(i);
+					if (e.contains(t, w)) {
+						e.dist = e.distTo(q);
+						pq.add(e);
+					}
+				}
+			}
+		}
+		return next;
+	}
+	public ArrayList<BEntry> kNNSearch(Point q, String t, Words w, int k) {
+		ArrayList<BEntry> knns = new ArrayList<BEntry>();
+		PriorityQueue<BEntry> pq = new PriorityQueue<BEntry>(11, BEntry.CompareDist);
+		for(int i = 0; i < R.size(); i++) {
+			BEntry e = R.get(i);
+			if (e.contains(t, w)) {
+				e.dist = e.distTo(q);
+				pq.add(e);
+			}
+		}
+		for (int i=0; i < k; i++){
+			knns.add(nextNN(q, t, w, pq));
+		}
+		return knns;
+	}
+	
+	public BEntry nextNN(Point q, HashSet<String> T, Words w, PriorityQueue<BEntry> pq) {
+		if (pq == null) {
+			pq = new PriorityQueue<BEntry>(11, BEntry.CompareDist);
+			for(int i = 0; i < R.size(); i++) {
+				BEntry e = R.get(i);
+				if (e.intersect(T, w)) {
+					e.dist = e.distTo(q);
+					pq.add(e);
+				}
+			}
+		}
+		BEntry next;
+		while ((next=pq.poll()) != null)
+		{
+			if (next instanceof BLEntry) {// point
+				if (next.intersect(T, w)) {
+					T.removeAll(((BLEntry)next).obj.text);
+					break;
+				}
+			}
+			else {
+				for(int i = 0; i < next.child.size(); i++) { // node
+					BEntry e = next.child.get(i);
+					if (e.intersect(T, w)) {
+						e.dist = e.distTo(q);
+						pq.add(e);
+					}
+				}
+			}
+		}
+		return next;
+	}
+	public ArrayList<BEntry> textNNSearch(Point q, HashSet<String> T, Words w) {
+		HashSet<String> Tmp = new HashSet<String>(T);
+		ArrayList<BEntry> nns = new ArrayList<BEntry>();
+		PriorityQueue<BEntry> pq = new PriorityQueue<BEntry>(11, BEntry.CompareDist);
+		for(int i = 0; i < R.size(); i++) {
+			BEntry e = R.get(i);
+			if (e.intersect(Tmp, w)) {
+				e.dist = e.distTo(q);
+				pq.add(e);
+			}
+		}
+		while (!Tmp.isEmpty()) {
+			nns.add(nextNN(q, Tmp, w, pq));
+		}
+		return nns;
+	}
 
 	public BEntry nextNN(Point q, PriorityQueue<BEntry> pq) {
 		if (pq == null) {
-			nodeCount = 1;
-			leafCount = 0;
+
 			pq = new PriorityQueue<BEntry>(11, BEntry.CompareDist);
 			for(int i = 0; i < R.size(); i++) {
 				BEntry e = R.get(i);
@@ -69,11 +167,9 @@ public class BRTree {
 		BEntry next;
 		while ((next=pq.poll()) != null)
 		{
-			if (next.child == null) // point
+			if (next instanceof BLEntry) // point
 				break;
 			else {
-				if(next.child.isleaf) leafCount++;
-				else nodeCount++;
 				for(int i = 0; i < next.child.size(); i++) { // node
 					BEntry e = next.child.get(i);
 					e.dist = e.distTo(q);
@@ -83,11 +179,9 @@ public class BRTree {
 		}
 		return next;
 	}
-
 	public ArrayList<BEntry> kNNSearch(Point q, int k) {
 		ArrayList<BEntry> knns = new ArrayList<BEntry>();
-		nodeCount = 1;
-		leafCount = 0;
+
 		PriorityQueue<BEntry> pq = new PriorityQueue<BEntry>(11, BEntry.CompareDist);
 		for(int i = 0; i < R.size(); i++) {
 			BEntry e = R.get(i);
@@ -104,7 +198,7 @@ public class BRTree {
 	private BNode chooseLeaf(BEntry e){
 		BNode n = R;
 		while (!n.isleaf){
-			n.updateBMP((BLEntry)e);
+			n.updateBitmap((BLEntry)e, BRTree.W);
 			double mincost = Double.MAX_VALUE;
 			double s = -1, d;
 			BEntry se = null;
@@ -145,6 +239,7 @@ public class BRTree {
 			}
 			n = se.child;
 		}
+		n.updateBitmap((BLEntry)e, BRTree.W);
 		return n;
 	}
 
