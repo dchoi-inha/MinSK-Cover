@@ -42,8 +42,8 @@ public class Point implements Comparable<Point> {
 
 
 	public String toString() {
-		return ""+x+"\t"+y+"";
-		//			return "("+x+" "+String.format("%08X", x)+","+y+" "+String.format("%08X", y)+")";
+//		return ""+x+"\t"+y+"";
+		return "("+String.format("%4.3f", x)+","+String.format("%4.3f", y)+")";
 	}
 
 	@Override

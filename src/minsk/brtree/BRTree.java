@@ -117,7 +117,7 @@ public class BRTree {
 			}
 		}
 		BEntry next;
-		while ((next=pq.poll()) != null)
+		while ((next=pq.poll()) != null && !T.isEmpty())
 		{
 			if (next instanceof BLEntry) {// point
 				if (next.intersect(T, w)) {

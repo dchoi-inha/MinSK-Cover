@@ -43,16 +43,17 @@ public class Main {
 			System.out.print("M: " + RTree.M + " m: " + RTree.m + " objects: " + db.size() + " nodes: "+rt.nodes+" heights: "+rt.height+ "\n");
 			System.out.print("keywords: " + Env.W.size() + "\n");
 			
-			long s1 = 0, s2 = 0, s3 = 0;
 			long cpuTimeElapsed;
 			
-			int k = 1, l = 4;
-			for (int i = 0; i<100; i++){
+			int k = 1, l = 40;
+			for (int i = 0; i<1; i++){
 				// generate random query
 				double x = Math.random();
 				double y = Math.random();
 				Point q = new Point(x,	y);
+//				Point q = new Point(0.504,	0.218);
 				HashSet<String> T = Env.W.rand(l);
+//				HashSet<String> T = new HashSet<String>(Arrays.asList(new String [] {"Eurolink", "Car", "Estate", "Commercial"}));
 				System.out.println("q:" + q + "  T:" + T);
 
 				cpuTimeElapsed = Util.getCpuTime();
