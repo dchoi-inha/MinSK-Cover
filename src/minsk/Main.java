@@ -10,6 +10,7 @@ import java.util.HashSet;
 
 import minsk.structure.*;
 import minsk.util.Util;
+import minsk.algorithm.Algorithm;
 import minsk.brtree.*;
 import minsk.docindex.*;
 import minsk.rtree.*;
@@ -23,6 +24,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		try {
+			Algorithm alg = new Algorithm();
 			Env.W = new Words();
 			Dataset db = construct("UK.txt");
 			
@@ -45,15 +47,15 @@ public class Main {
 			
 			long cpuTimeElapsed;
 			
-			int k = 1, l = 40;
+			int k = 1, l = 4;
 			for (int i = 0; i<1; i++){
 				// generate random query
 				double x = Math.random();
 				double y = Math.random();
 				Point q = new Point(x,	y);
 //				Point q = new Point(0.504,	0.217);
-//				HashSet<String> T = Env.W.rand(l);
-				HashSet<String> T = new HashSet<String>(Arrays.asList(new String [] {"Car", "Link", "Crescent", "Londonderry"}));
+				HashSet<String> T = Env.W.rand(l);
+//				HashSet<String> T = new HashSet<String>(Arrays.asList(new String [] {"Car", "Link", "Crescent", "Londonderry"}));
 				System.out.println("q:" + q + "  T:" + T);
 
 				cpuTimeElapsed = Util.getCpuTime();
@@ -65,9 +67,9 @@ public class Main {
 				System.out.println("List\t------------------------------" + cpuTimeElapsed/(double)1000000000);
 				
 				cpuTimeElapsed = Util.getCpuTime();
-				ArrayList<BEntry> result1 = brt.textNNSearch(q, T, Env.W);
-				for (BEntry e: result1) {
-					System.out.println(((BLEntry)e).obj);
+				ArrayList<STObject> result1 = brt.textNNSearch(q, T, Env.W);
+				for (STObject o: result1) {
+					System.out.println(o);
 				}
 				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
 				System.out.println("bRtree\t------------------------------" + cpuTimeElapsed/(double)1000000000);
@@ -79,15 +81,33 @@ public class Main {
 				for (STObject o: fdb) {
 					fbrt.insert(o);
 				}
-				ArrayList<BEntry> result2 = fbrt.textNNSearch(q, T, w);
-				for (BEntry e: result2) {
-					System.out.println(((BLEntry)e).obj);
+				ArrayList<STObject> result2 = fbrt.textNNSearch(q, T, w);
+				for (STObject o: result2) {
+					System.out.println(o);
 				}
 				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
 				System.out.println("vir bRtree\t------------------------------" + cpuTimeElapsed/(double)1000000000);
 
+				cpuTimeElapsed = Util.getCpuTime();
+				HashSet<STObject> result3 = alg.GKG(T, brt, iv, Env.W);
+				for (STObject o: result3) {
+					System.out.println(o);
+				}
+				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
+				System.out.println("GKG bRtree\t------------------------------" + cpuTimeElapsed/(double)1000000000);
+				
+				
+				cpuTimeElapsed = Util.getCpuTime();
+				HashSet<STObject> result4 = alg.GKG(T, fbrt, iv, w);
+				for (STObject o: result4) {
+					System.out.println(o);
+				}
+				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
+				System.out.println("GKG vir\t------------------------------" + cpuTimeElapsed/(double)1000000000);
 
 
+				
+				
 				
 				System.out.println("\n");
 			}

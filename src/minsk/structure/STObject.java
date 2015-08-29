@@ -58,15 +58,15 @@ public class STObject {
 	}
 	
 	
-//	@Override
-//	public int hashCode() {
-//		return id;
-//	}
-//
-//	@Override
-//	public boolean equals(Object obj) {
-//		return (id == ((STObject)obj).id);
-//	}
+	@Override
+	public int hashCode() {
+		return id;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return (id == ((STObject)obj).id);
+	}
 
 	public int compareLoc(STObject o) {
 		if (loc.x == o.loc.x && loc.y != o.loc.y) return (loc.y - o.loc.y > 0? 1 : -1);

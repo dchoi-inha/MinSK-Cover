@@ -5,8 +5,11 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+
+import minsk.structure.STObject;
 
 
 /**
@@ -57,6 +60,19 @@ public class Util {
 		}
 		
 		return text;
+	}
+	
+	public static double diameter(Collection<? extends STObject> c) {
+		double max = Double.MIN_VALUE;
+		for (STObject o1: c) {
+			for (STObject o2: c) {
+				double dist = o1.loc.distance(o2.loc);
+				if (max < dist) {
+					max = dist;
+				}
+			}
+		}
+		return max;
 	}
 	
 	

@@ -59,7 +59,7 @@ public class BRTree {
 		return result;
 	}
 	
-	public BEntry nextNN(Point q, String t, Words w, PriorityQueue<BEntry> pq) {
+	public STObject nextNN(Point q, String t, Words w, PriorityQueue<BEntry> pq) {
 		if (pq == null) {
 			pq = new PriorityQueue<BEntry>(11, BEntry.CompareDist);
 			for(int i = 0; i < R.size(); i++) {
@@ -87,10 +87,10 @@ public class BRTree {
 				}
 			}
 		}
-		return next;
+		return ((BLEntry)next).obj;
 	}
-	public ArrayList<BEntry> kNNSearch(Point q, String t, Words w, int k) {
-		ArrayList<BEntry> knns = new ArrayList<BEntry>();
+	public ArrayList<STObject> kNNSearch(Point q, String t, Words w, int k) {
+		ArrayList<STObject> knns = new ArrayList<STObject>();
 		PriorityQueue<BEntry> pq = new PriorityQueue<BEntry>(11, BEntry.CompareDist);
 		for(int i = 0; i < R.size(); i++) {
 			BEntry e = R.get(i);
@@ -105,7 +105,7 @@ public class BRTree {
 		return knns;
 	}
 	
-	public BEntry nextNN(Point q, HashSet<String> T, Words w, PriorityQueue<BEntry> pq) {
+	public STObject nextNN(Point q, HashSet<String> T, Words w, PriorityQueue<BEntry> pq) {
 		if (pq == null) {
 			pq = new PriorityQueue<BEntry>(11, BEntry.CompareDist);
 			for(int i = 0; i < R.size(); i++) {
@@ -135,11 +135,11 @@ public class BRTree {
 				}
 			}
 		}
-		return next;
+		return ((BLEntry)next).obj;
 	}
-	public ArrayList<BEntry> textNNSearch(Point q, HashSet<String> T, Words w) {
+	public ArrayList<STObject> textNNSearch(Point q, HashSet<String> T, Words w) {
 		HashSet<String> Tmp = new HashSet<String>(T);
-		ArrayList<BEntry> nns = new ArrayList<BEntry>();
+		ArrayList<STObject> nns = new ArrayList<STObject>();
 		PriorityQueue<BEntry> pq = new PriorityQueue<BEntry>(11, BEntry.CompareDist);
 		for(int i = 0; i < R.size(); i++) {
 			BEntry e = R.get(i);
@@ -154,7 +154,7 @@ public class BRTree {
 		return nns;
 	}
 
-	public BEntry nextNN(Point q, PriorityQueue<BEntry> pq) {
+	public STObject nextNN(Point q, PriorityQueue<BEntry> pq) {
 		if (pq == null) {
 
 			pq = new PriorityQueue<BEntry>(11, BEntry.CompareDist);
@@ -177,10 +177,10 @@ public class BRTree {
 				}
 			}
 		}
-		return next;
+		return ((BLEntry)next).obj;
 	}
-	public ArrayList<BEntry> kNNSearch(Point q, int k) {
-		ArrayList<BEntry> knns = new ArrayList<BEntry>();
+	public ArrayList<STObject> kNNSearch(Point q, int k) {
+		ArrayList<STObject> knns = new ArrayList<STObject>();
 
 		PriorityQueue<BEntry> pq = new PriorityQueue<BEntry>(11, BEntry.CompareDist);
 		for(int i = 0; i < R.size(); i++) {
