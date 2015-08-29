@@ -33,6 +33,10 @@ public class InvertedFile {
 			postings.add(o);
 		}
 	}
+	
+	public int freq(String t) {
+		return getList(t).size();
+	}
 		
 	public Set<String> keywords() {
 		return map.keySet();
