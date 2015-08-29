@@ -63,7 +63,7 @@ public class Util {
 	public static long getCpuTime() {
 		ThreadMXBean bean = ManagementFactory.getThreadMXBean();
 		return bean.isCurrentThreadCpuTimeSupported()?
-				bean.getCurrentThreadCpuTime()/1000000L: 0L;
+				bean.getCurrentThreadCpuTime(): 0L;
 	}
 	
 }

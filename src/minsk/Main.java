@@ -51,9 +51,9 @@ public class Main {
 				double x = Math.random();
 				double y = Math.random();
 				Point q = new Point(x,	y);
-//				Point q = new Point(0.504,	0.218);
-				HashSet<String> T = Env.W.rand(l);
-//				HashSet<String> T = new HashSet<String>(Arrays.asList(new String [] {"Eurolink", "Car", "Estate", "Commercial"}));
+//				Point q = new Point(0.5042344,	0.2175871);
+//				HashSet<String> T = Env.W.rand(l);
+				HashSet<String> T = new HashSet<String>(Arrays.asList(new String [] {"Eurolink", "Sittingbourne", "Estate", "Commercial"}));
 				System.out.println("q:" + q + "  T:" + T);
 
 				cpuTimeElapsed = Util.getCpuTime();
@@ -62,7 +62,7 @@ public class Main {
 					System.out.println(e.obj);
 				}
 				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
-				System.out.println("------------------------------" + cpuTimeElapsed);
+				System.out.println("List\t------------------------------" + cpuTimeElapsed/(double)1000000000);
 				
 				cpuTimeElapsed = Util.getCpuTime();
 				ArrayList<BEntry> result1 = brt.textNNSearch(q, T, Env.W);
@@ -70,7 +70,7 @@ public class Main {
 					System.out.println(((BLEntry)e).obj);
 				}
 				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
-				System.out.println("------------------------------" + cpuTimeElapsed);
+				System.out.println("bRtree\t------------------------------" + cpuTimeElapsed/(double)1000000000);
 
 				cpuTimeElapsed = Util.getCpuTime();
 				Dataset fdb = iv.dataset(T);
@@ -84,7 +84,7 @@ public class Main {
 					System.out.println(((BLEntry)e).obj);
 				}
 				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
-				System.out.println("------------------------------" + cpuTimeElapsed);
+				System.out.println("vir bRtree\t------------------------------" + cpuTimeElapsed/(double)1000000000);
 
 
 
