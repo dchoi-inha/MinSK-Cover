@@ -51,9 +51,9 @@ public class Main {
 				double x = Math.random();
 				double y = Math.random();
 				Point q = new Point(x,	y);
-//				Point q = new Point(0.5042344,	0.2175871);
+//				Point q = new Point(0.504,	0.217);
 //				HashSet<String> T = Env.W.rand(l);
-				HashSet<String> T = new HashSet<String>(Arrays.asList(new String [] {"Eurolink", "Sittingbourne", "Estate", "Commercial"}));
+				HashSet<String> T = new HashSet<String>(Arrays.asList(new String [] {"Car", "Link", "Crescent", "Londonderry"}));
 				System.out.println("q:" + q + "  T:" + T);
 
 				cpuTimeElapsed = Util.getCpuTime();
