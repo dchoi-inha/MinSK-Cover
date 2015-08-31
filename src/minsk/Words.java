@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Random;
 
+import minsk.docindex.InvertedFile;
+import minsk.structure.Dataset;
 import minsk.structure.STObject;
 import minsk.util.Bitmap;
 import minsk.util.Util;
@@ -56,17 +58,5 @@ public class Words {
 	
 	public int getIdx(String t) {
 		return indices.get(t);
-	}
-	
-	public HashSet<String> rand(int l) {
-		HashSet<String> T = new HashSet<String>();
-		Random r = new Random();
-		for (int i = 0; i < l; i++) {
-			String s = words.get(r.nextInt(words.size()));
-			if (T.contains(s)) {
-				i--;
-			} else T.add(s);
-		}
-		return T;
 	}
 }

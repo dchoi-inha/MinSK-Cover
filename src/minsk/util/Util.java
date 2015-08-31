@@ -8,7 +8,12 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Random;
 
+import minsk.Env;
+import minsk.Words;
+import minsk.docindex.InvertedFile;
+import minsk.structure.Dataset;
 import minsk.structure.STObject;
 
 
@@ -67,9 +72,7 @@ public class Util {
 		for (STObject o1: c) {
 			for (STObject o2: c) {
 				double dist = o1.loc.distance(o2.loc);
-				if (max < dist) {
-					max = dist;
-				}
+				if (max < dist)	max = dist;
 			}
 		}
 		return max;
@@ -80,6 +83,18 @@ public class Util {
 		ThreadMXBean bean = ManagementFactory.getThreadMXBean();
 		return bean.isCurrentThreadCpuTimeSupported()?
 				bean.getCurrentThreadCpuTime(): 0L;
+	}
+	
+	public static HashSet<String> rand(int l, Words w, InvertedFile iv, Dataset db) {
+		HashSet<String> T = new HashSet<String>();
+		Random r = new Random();
+		for (int i = 0; i < l; i++) {
+			String s = w.words.get(r.nextInt(w.words.size()));
+			if (T.contains(s) || (iv.freq(s) < Env.PF*(double)db.size())) {
+				i--;
+			} else T.add(s);
+		}
+		return T;
 	}
 	
 }

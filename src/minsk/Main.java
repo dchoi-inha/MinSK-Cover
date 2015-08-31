@@ -33,47 +33,51 @@ public class Main {
 			InvertedFile iv = new InvertedFile();
 			LinList list = new LinList();
 
-			System.out.println("Indexing Start");
+			System.out.print("Indexing Start");
 			for (STObject o: db) {
 //				rt.insert(o);
 				brt.insert(o);
 				iv.add(o);
 				list.add(o);
 			}
-			System.out.println("Indexing End");
+			System.out.println("---Indexing End");
 			
-			System.out.print("M: " + RTree.M + " m: " + RTree.m + " objects: " + db.size() + " nodes: "+rt.nodes+" heights: "+rt.height+ "\n");
-			System.out.print("keywords: " + Env.W.size() + "\n");
+			System.out.print("M: " + RTree.M + " m: " + RTree.m);
+			System.out.print(" objects: " + db.size() + " nodes: "+rt.nodes+" heights: "+rt.height);
+			System.out.println(" keywords: " + Env.W.size()+"\n");
 			
 			long cpuTimeElapsed;
 			
-			int k = 1, l = 4;
-			for (int i = 0; i<1; i++){
+			int k = 1, l = 10;
+			for (int i = 0; i<10; i++){
 				// generate random query
 				double x = Math.random();
 				double y = Math.random();
 				Point q = new Point(x,	y);
 //				Point q = new Point(0.504,	0.217);
-				HashSet<String> T = Env.W.rand(l);
+				HashSet<String> T = Util.rand(l, Env.W, iv, db);
 //				HashSet<String> T = new HashSet<String>(Arrays.asList(new String [] {"Car", "Link", "Crescent", "Londonderry"}));
-				System.out.println("q:" + q + "  T:" + T);
+				System.out.println("q:" + q + "  T:" + T + "\n");
 
-				cpuTimeElapsed = Util.getCpuTime();
-				for (String t: T) {
-					BLEntry e = (BLEntry)list.nextNN(q, t, Env.W);
-					System.out.println(e.obj);
-				}
-				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
-				System.out.println("List\t------------------------------" + cpuTimeElapsed/(double)1000000000);
+				// list knn search
+//				cpuTimeElapsed = Util.getCpuTime();
+//				for (String t: T) {
+//					BLEntry e = (BLEntry)list.nextNN(q, t, Env.W);
+//					System.out.println(e.obj);
+//				}
+//				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
+//				System.out.println("List\t------------------------------" + cpuTimeElapsed/(double)1000000000);
 				
-				cpuTimeElapsed = Util.getCpuTime();
-				ArrayList<STObject> result1 = brt.textNNSearch(q, T, Env.W);
-				for (STObject o: result1) {
-					System.out.println(o);
-				}
-				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
-				System.out.println("bRtree\t------------------------------" + cpuTimeElapsed/(double)1000000000);
+				// big bR-tree knn search
+//				cpuTimeElapsed = Util.getCpuTime();
+//				ArrayList<STObject> result1 = brt.textNNSearch(q, T, Env.W);
+//				for (STObject o: result1) {
+//					System.out.println(o);
+//				}
+//				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
+//				System.out.println("bRtree\t------------------------------" + cpuTimeElapsed/(double)1000000000);
 
+				// virtual bR-tree knn search
 				cpuTimeElapsed = Util.getCpuTime();
 				Dataset fdb = iv.dataset(T);
 				Words w = new Words(T);
@@ -81,32 +85,26 @@ public class Main {
 				for (STObject o: fdb) {
 					fbrt.insert(o);
 				}
-				ArrayList<STObject> result2 = fbrt.textNNSearch(q, T, w);
-				for (STObject o: result2) {
-					System.out.println(o);
-				}
-				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
-				System.out.println("vir bRtree\t------------------------------" + cpuTimeElapsed/(double)1000000000);
+//				ArrayList<STObject> result2 = fbrt.textNNSearch(q, T, w);
+//				for (STObject o: result2) {
+//					System.out.println(o);
+//				}
+//				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
+//				System.out.println("vir bRtree------------------------------" + cpuTimeElapsed/(double)1000000000);
 
+				// Greedy Keyword Group (GKG) on a virtual bR-tree
+//				cpuTimeElapsed = Util.getCpuTime();
+				Group result4 = alg.GKG(T, fbrt, iv, w);
+				System.out.print(result4);
+				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
+				System.out.println("GKG vir bRtree------------------------------" + cpuTimeElapsed/(double)1000000000);
+				
+				// Greedy Keyword Group (GKG) on a big bR-tree
 				cpuTimeElapsed = Util.getCpuTime();
-				HashSet<STObject> result3 = alg.GKG(T, brt, iv, Env.W);
-				for (STObject o: result3) {
-					System.out.println(o);
-				}
+				Group result3 = alg.GKG(T, brt, iv, Env.W);
+				System.out.print(result3);
 				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
-				System.out.println("GKG bRtree\t------------------------------" + cpuTimeElapsed/(double)1000000000);
-				
-				
-				cpuTimeElapsed = Util.getCpuTime();
-				HashSet<STObject> result4 = alg.GKG(T, fbrt, iv, w);
-				for (STObject o: result4) {
-					System.out.println(o);
-				}
-				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
-				System.out.println("GKG vir\t------------------------------" + cpuTimeElapsed/(double)1000000000);
-
-
-				
+				System.out.println("GKG bRtree------------------------------" + cpuTimeElapsed/(double)1000000000);
 				
 				
 				System.out.println("\n");
@@ -122,7 +120,7 @@ public class Main {
 		Dataset db = new Dataset();
 		BufferedReader in = new BufferedReader(new FileReader(new File(filename)));
  		int count = 1;  
-		System.out.print("DB Load Start\n");
+		System.out.print("DB Load Start");
 		
 		final HashSet<String> symbols = new HashSet<String>();
 		String[] spChars = {
@@ -157,7 +155,7 @@ public class Main {
 			count ++; 
 		}
 		
-		System.out.print("DB Load End\n");
+		System.out.print("---DB Load End\n");
 		in.close();
 		
 		return db;

@@ -119,10 +119,10 @@ public class BRTree {
 		BEntry next;
 		while ((next=pq.poll()) != null && !T.isEmpty())
 		{
-			if (next instanceof BLEntry) {// point
+			if (next instanceof BLEntry) { // point
 				if (next.intersect(T, w)) {
 					T.removeAll(((BLEntry)next).obj.text);
-					break;
+					break; // return this point
 				}
 			}
 			else {

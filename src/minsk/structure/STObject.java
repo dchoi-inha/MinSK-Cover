@@ -52,9 +52,9 @@ public class STObject {
 
 	public String toString()
 	{
-//		return id+"" ;
+		return id+"" ;
 
-		return id + "-->" + loc.toString() + " " + text.toString();
+//		return id + "-->" + loc.toString() + " " + text.toString();
 	}
 	
 	
