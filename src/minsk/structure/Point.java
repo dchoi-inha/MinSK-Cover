@@ -39,7 +39,10 @@ public class Point implements Comparable<Point> {
 		this.y = y;
 	}
 
-
+    public Point midPoint(Point p)
+    {
+		return new Point((x+p.x)/2.0, (y+p.y)/2.0);
+    }
 
 	public String toString() {
 //		return ""+x+"\t"+y+"";

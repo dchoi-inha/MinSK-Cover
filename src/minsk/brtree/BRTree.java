@@ -32,7 +32,7 @@ public class BRTree {
 			R = n;
 			height++;
 		}
-		W = words;
+		W = words; // This is somewhat not appropriate, but I had no time....
 	}
 
 	/* Search */

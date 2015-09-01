@@ -31,14 +31,14 @@ public class Main {
 			RTree rt = new RTree();
 			BRTree brt = new BRTree(Env.W);
 			InvertedFile iv = new InvertedFile();
-			LinList list = new LinList();
+//			LinList list = new LinList();
 
 			System.out.print("Indexing Start");
 			for (STObject o: db) {
 //				rt.insert(o);
 				brt.insert(o);
 				iv.add(o);
-				list.add(o);
+//				list.add(o);
 			}
 			System.out.println("---Indexing End");
 			
@@ -78,13 +78,7 @@ public class Main {
 //				System.out.println("bRtree\t------------------------------" + cpuTimeElapsed/(double)1000000000);
 
 				// virtual bR-tree knn search
-				cpuTimeElapsed = Util.getCpuTime();
-				Dataset fdb = iv.dataset(T);
-				Words w = new Words(T);
-				BRTree fbrt = new BRTree(w);
-				for (STObject o: fdb) {
-					fbrt.insert(o);
-				}
+//				cpuTimeElapsed = Util.getCpuTime();
 //				ArrayList<STObject> result2 = fbrt.textNNSearch(q, T, w);
 //				for (STObject o: result2) {
 //					System.out.println(o);
@@ -93,17 +87,24 @@ public class Main {
 //				System.out.println("vir bRtree------------------------------" + cpuTimeElapsed/(double)1000000000);
 
 				// Greedy Keyword Group (GKG) on a virtual bR-tree
-//				cpuTimeElapsed = Util.getCpuTime();
-				Group result4 = alg.GKG(T, fbrt, iv, w);
-				System.out.print(result4);
+				cpuTimeElapsed = Util.getCpuTime();
+				Group result4 = alg.GKG(T, iv);
 				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
-				System.out.println("GKG vir bRtree------------------------------" + cpuTimeElapsed/(double)1000000000);
+				System.out.print(result4);
+				System.out.println("GKG vir-bRtree------------------------------" + cpuTimeElapsed/(double)1000000000);
 				
-				// Greedy Keyword Group (GKG) on a big bR-tree
+				// SKEC algorithm
+				cpuTimeElapsed = Util.getCpuTime();
+				Group result5 = alg.SKEC(T, iv);
+				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
+				System.out.print(result5);
+				System.out.println("SKEC------------------------------" + cpuTimeElapsed/(double)1000000000);
+				
+				// Greedy Keyword Group (GKG) on a bR-tree
 				cpuTimeElapsed = Util.getCpuTime();
 				Group result3 = alg.GKG(T, brt, iv, Env.W);
-				System.out.print(result3);
 				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
+				System.out.print(result3);
 				System.out.println("GKG bRtree------------------------------" + cpuTimeElapsed/(double)1000000000);
 				
 				
@@ -116,7 +117,7 @@ public class Main {
 		}
 	}
 
-	public static Dataset construct (String filename) throws IOException{
+	public static Dataset construct(String filename) throws IOException{
 		Dataset db = new Dataset();
 		BufferedReader in = new BufferedReader(new FileReader(new File(filename)));
  		int count = 1;  

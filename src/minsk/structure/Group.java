@@ -13,6 +13,11 @@ public class Group implements Iterable<STObject>{
 		g = new ArrayList<STObject>();
 	}
 	
+	public Group(STObject o) {
+		g = new ArrayList<STObject>();
+		g.add(o);
+	}
+	
 	public Group(Collection<? extends STObject> c) {
 		g = new ArrayList<STObject>(c);
 	}
