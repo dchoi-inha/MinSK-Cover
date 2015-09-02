@@ -148,4 +148,24 @@ public class Util {
 		return T;
 	}
 	
+	
+	public static double getAngle(Point origin, Point target) {
+		double dx = target.x - origin.x;
+		double dy = target.y - origin.y;
+		
+		double theta = Math.toDegrees(Math.atan2(dy, dx)); 
+		if (theta < 0) theta += 360;
+		
+		return theta; 
+	}
+	
+	
+	public static void main(String [] args) {
+		
+		Point origin = new Point(2, 2);
+		Point target = new Point(4, 1.9);
+		
+		System.out.println(getAngle(origin, target));
+		
+	}
 }

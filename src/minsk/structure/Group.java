@@ -2,11 +2,13 @@ package minsk.structure;
 
 import java.util.Collection;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 
 public class Group implements Iterable<STObject>{
 
 	private ArrayList<STObject> g;
+	private WordTab tab;
 	private double d = -1;
 	
 	public Group() {
@@ -67,12 +69,44 @@ public class Group implements Iterable<STObject>{
 	public String toString() {
 		String s="";
 		
-		s += "d: " + dia() + " n: " + size() + "\n";
+		s += "dia: " + dia() + " n: " + size() + "\n";
 		s += "cost1: " + cost1() + " cost2: " + cost2() + "\n";
 		s += g.toString(); s+="\n";
 //		for (STObject o: g) s += o.toString() + "\n";
 		
 		return s;
+	}
+	
+	public boolean covers(HashSet<String> T) {
+		if (tab == null) {
+			tab = new WordTab();
+			for (STObject o: g) tab.add(o);
+		}
+		return tab.containsAll(T);
+	}
+	
+	public void shrink(HashSet<String> T) {
+		// naive greedy set cover
+		HashSet<String> U = new HashSet<String>(T);
+		ArrayList<STObject> tg = new ArrayList<STObject>();
+		
+		while (!U.isEmpty()) {
+			int cnt, maxC = Integer.MIN_VALUE;
+			STObject next=null;
+			for (STObject o: g) {
+				cnt = o.interCnt(U);
+				if (cnt > maxC) {
+					maxC = cnt;
+					next = o;
+				}
+			}
+			if (next != null) {
+				U.removeAll(next.text);
+				tg.add(next);
+			}
+		}
+		g = tg;
+		tab = null;
 	}
 	
 }

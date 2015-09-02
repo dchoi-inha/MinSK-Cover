@@ -8,4 +8,7 @@ public class PairObject <P1, P2> {
 		this.p1 = p1;
 		this.p2 = p2;
 	}
+
+	public PairObject() {
+	}
 }

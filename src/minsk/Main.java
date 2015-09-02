@@ -48,8 +48,8 @@ public class Main {
 			
 			long cpuTimeElapsed;
 			
-			int k = 1, l = 10;
-			for (int i = 0; i<10; i++){
+			int k = 1, l = 40;
+			for (int i = 0; i<1; i++){
 				// generate random query
 				double x = Math.random();
 				double y = Math.random();
@@ -86,26 +86,42 @@ public class Main {
 //				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
 //				System.out.println("vir bRtree------------------------------" + cpuTimeElapsed/(double)1000000000);
 
+				// Greedy Keyword Group (GKG) on a bR-tree
+//				cpuTimeElapsed = Util.getCpuTime();
+//				Group result3 = alg.GKG(T, brt, iv, Env.W);
+//				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
+//				System.out.print(result3);
+//				System.out.println("GKG bRtree---------------------------------" + cpuTimeElapsed/(double)1000000000);
+
 				// Greedy Keyword Group (GKG) on a virtual bR-tree
 				cpuTimeElapsed = Util.getCpuTime();
 				Group result4 = alg.GKG(T, iv);
+				result4.shrink(T);
 				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
 				System.out.print(result4);
 				System.out.println("GKG vir-bRtree------------------------------" + cpuTimeElapsed/(double)1000000000);
 				
-				// SKEC algorithm
+				// SKECa algorithm
 				cpuTimeElapsed = Util.getCpuTime();
-				Group result5 = alg.SKEC(T, iv);
+				Group result5 = alg.SKECa(T, iv);
+				result5.shrink(T);
 				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
 				System.out.print(result5);
-				System.out.println("SKEC------------------------------" + cpuTimeElapsed/(double)1000000000);
-				
-				// Greedy Keyword Group (GKG) on a bR-tree
+				System.out.println("SKECa--------------------------------------" + cpuTimeElapsed/(double)1000000000);
+
+				// SKECa+ algorithm
 				cpuTimeElapsed = Util.getCpuTime();
-				Group result3 = alg.GKG(T, brt, iv, Env.W);
+				Group result6 = alg.SKECaplus(T, iv);
+				result6.shrink(T);
 				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
-				System.out.print(result3);
-				System.out.println("GKG bRtree------------------------------" + cpuTimeElapsed/(double)1000000000);
+				System.out.print(result6);
+				System.out.println("SKECaplus+++++++++++++++++++++++++++++++++++" + cpuTimeElapsed/(double)1000000000);
+
+				
+				
+				
+				if (!(result4.covers(T) && result5.covers(T) && result6.covers(T)))
+					System.err.println("result does not cover T");
 				
 				
 				System.out.println("\n");

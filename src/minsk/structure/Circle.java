@@ -81,16 +81,15 @@ public class Circle
     	if ( Double.isNaN(r) )
     		System.out.println(p.toString() + p1.toString() + p2.toString() + p3.toString());
     	// DEBUG
-    	
     }
     
 	// Get the center
-	public Point getCenter()
+	public Point center()
 	{
 		return p;
 	}
 	// Get the radius
-	public double getRadius()
+	public double radius()
 	{
 		return r;
 	}
@@ -117,17 +116,17 @@ public class Circle
 		r *= factor;
     }
     // Calculate the diameter of a circle
-    public double getDiameter()
+    public double dia()
     {
 		return (2*r);
     }
     // Calculate the circumference of a circle
-    public double getCircumference()
+    public double circumference()
     {
 		return (Math.PI*2*r);
     }
     // Calcualte the area of a circle
-    public double getArea()
+    public double area()
     {
 		return (Math.PI*r*r);
     }
@@ -153,7 +152,7 @@ public class Circle
 	
 	public boolean contain(Circle circle)
 	{
-		return ( p.distance(circle.getCenter()) + circle.getRadius() <= r );
+		return ( p.distance(circle.center()) + circle.radius() <= r );
 	}
 	
 	// Determine whether two points are equal

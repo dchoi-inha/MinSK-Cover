@@ -16,6 +16,8 @@ public class Env {
 	public static final int B = 1024; // bytes
 
 	public static Words W = new Words();
+
+	public static double ep = 0.01;
 	
 	public static final double PF = 0.01;
 }

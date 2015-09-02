@@ -7,6 +7,8 @@ import java.util.PriorityQueue;
 
 import minsk.Env;
 import minsk.Words;
+import minsk.structure.Circle;
+import minsk.structure.Group;
 import minsk.structure.Point;
 import minsk.structure.STObject;
 
@@ -36,28 +38,51 @@ public class BRTree {
 	}
 
 	/* Search */
-	private void _search(BNode T, double xl, double xh, double yl, double yh, ArrayList<BEntry> result){
+	private void _search(BNode T, double xl, double xh, double yl, double yh, ArrayList<STObject> result){
 		BEntry e;
-		if (T.isleaf) leafCount++;
-		else nodeCount++;
+
 		for (int a=0; a<T.size(); a++){
 			e = T.get(a);
 			if (((!(xh<e.x.l || xl>e.x.h))) && (!(yl>e.y.h || yh<e.y.l))){
-				if (T.isleaf){ // leaf
-					result.add(e);
+				if (T.isleaf && e instanceof BLEntry){ // leaf
+					result.add(((BLEntry)e).obj);
 				}
 				else _search(e.child, xl, xh, yl, yh, result);
 			} 
 		}
 	}
-	public ArrayList<BEntry> rangeSearch(double xl, double xh, double yl, double yh){
-		ArrayList<BEntry> result = new ArrayList<BEntry>(); 
-		nodeCount = 0;
-		leafCount = 0;
+	public ArrayList<STObject> rangeSearch(double xl, double xh, double yl, double yh){
+		ArrayList<STObject> result = new ArrayList<STObject>(); 
 		_search(R, xl, xh, yl, yh, result);
 
 		return result;
 	}
+	
+	private void _cirSearch(BNode T, double xl, double xh, double yl, double yh, Circle c, Group result){
+		BEntry e;
+
+		for (int i=0; i<T.size(); i++){
+			e = T.get(i);
+			if (((!(xh<e.x.l || xl>e.x.h))) && (!(yl>e.y.h || yh<e.y.l))){
+				if (T.isleaf && e instanceof BLEntry){ // leaf
+					STObject o = ((BLEntry)e).obj;
+					if (c.contain(o.loc) <= 0) result.add(o);
+				}
+				else _cirSearch(e.child, xl, xh, yl, yh, c, result);
+			} 
+		}
+	}
+	public Group cirRangeSearch(Circle c) {
+		Group result = new Group();
+		double xl = c.center().x - c.radius();
+		double yl = c.center().y - c.radius();
+		double xh = c.center().x + c.radius();
+		double yh = c.center().y + c.radius();
+		
+		_cirSearch(R, xl, xh, yl, yh, c, result);
+		return result;		
+	}
+
 	
 	public STObject nextNN(Point q, String t, Words w, PriorityQueue<BEntry> pq) {
 		if (pq == null) {

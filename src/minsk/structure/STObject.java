@@ -48,6 +48,13 @@ public class STObject {
 //		this.text.addAll(obj.text);
 //	}
 	
+	public int interCnt(HashSet<String> T) {
+		HashSet<String> tmp = new HashSet<String>(T);
+		tmp.retainAll(text);
+		
+		return tmp.size();
+	}
+	
 
 
 	public String toString()
