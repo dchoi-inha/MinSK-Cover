@@ -12,6 +12,7 @@ import minsk.Env;
 import minsk.Words;
 import minsk.structure.Circle;
 import minsk.structure.Group;
+import minsk.structure.Lune;
 import minsk.structure.Point;
 import minsk.structure.STObject;
 
@@ -85,6 +86,27 @@ public class CBRTree {
 		
 		_cirSearch(R, xl, xh, yl, yh, c, result);
 		return result;		
+	}
+	
+	private void _luneSearch(CNode T, double xl, double xh, double yl, double yh, Lune l, Group result){
+		CEntry e;
+
+		for (int i=0; i<T.size(); i++){
+			e = T.get(i);
+			if (((!(xh<e.x.l || xl>e.x.h))) && (!(yl>e.y.h || yh<e.y.l))){
+				if (T.isleaf && e instanceof CLEntry){ // leaf
+					STObject o = ((CLEntry)e).obj;
+					if (l.contains(o.loc)) result.add(o);
+				}
+				else _luneSearch(e.child, xl, xh, yl, yh, l, result);
+			} 
+		}
+	}	
+	public Group luneRangeSearch(Lune l) {
+		Group result = new Group();
+		double mbr[] = l.mbr();
+		_luneSearch(R, mbr[0], mbr[1], mbr[2], mbr[3], l, result);
+		return result;
 	}
 
 	
@@ -182,10 +204,54 @@ public class CBRTree {
 		}
 		return nns;
 	}
+	
+	/**
+	 * @param o, the origin object
+	 * @param pq
+	 * @return the next NN of o whose cardinality is not larger than o.text
+	 */
+	public STObject nextNN(STObject o, PriorityQueue<CEntry> pq) {
+		if (pq == null ) pq = initPQ(o);
+		Point q = o.loc;
+		int len = o.text.size();
+		CEntry next;
+		while ((next=pq.poll()) != null)
+		{
+			if (next instanceof CLEntry) { // point
+				if (next.minCard() <= len && !((CLEntry)next).obj.checked) break;
+				else continue;
+			}
+			else {
+				for(int i = 0; i < next.child.size(); i++) { // node
+					CEntry e = next.child.get(i);
+					if (e.minCard() <= len) {
+						e.dist = e.distTo(q);
+						pq.add(e);
+					}
+				}
+			}
+		}
+		if (next != null) return ((CLEntry)next).obj;
+		else return null;
+	}
+
+	public PriorityQueue<CEntry> initPQ(STObject o) {
+		Point q = o.loc;
+		int len = o.text.size();
+		PriorityQueue<CEntry> pq;
+		pq = new PriorityQueue<CEntry>(11, CEntry.CompareDist);
+		for(int i = 0; i < R.size(); i++) {
+			CEntry e = R.get(i);
+			if (e.minCard() <= len) {
+				e.dist = e.distTo(q);
+				pq.add(e);
+			}
+		}
+		return pq;
+	}
 
 	public STObject nextNN(Point q, PriorityQueue<CEntry> pq) {
 		if (pq == null) {
-
 			pq = new PriorityQueue<CEntry>(11, CEntry.CompareDist);
 			for(int i = 0; i < R.size(); i++) {
 				CEntry e = R.get(i);

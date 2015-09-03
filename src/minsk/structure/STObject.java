@@ -17,6 +17,7 @@ public class STObject {
 	public Point loc; // original location
 	public HashSet<String> text;
 	
+	public boolean checked = false;
 	
 	public STObject(int i, double x, double y)
 	{
@@ -63,8 +64,8 @@ public class STObject {
 
 	public String toString()
 	{
-		return id+"" ;
-
+//		return id+"" ;
+		return id + loc.toString()+"["+text.size()+"]";
 //		return id + "-->" + loc.toString() + " " + text.toString();
 	}
 	

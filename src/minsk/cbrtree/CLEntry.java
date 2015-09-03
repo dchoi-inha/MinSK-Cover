@@ -32,5 +32,12 @@ public class CLEntry extends CEntry{
 		tmp.retainAll(obj.text); // intersection T and Object's text
 		return (!tmp.isEmpty());
 	}
+	
+	public int maxCard() {
+		return obj.text.size();
+	}
+	public int minCard() {
+		return obj.text.size();
+	}
 
 }

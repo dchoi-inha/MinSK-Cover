@@ -39,6 +39,13 @@ public class CEntry  {
 		y.h = yh;
 	}
 	
+	public int maxCard() {
+		return child.maxC;
+	}
+	public int minCard() {
+		return child.minC;
+	}
+	
 	public boolean intersect(HashSet<String> T, Words w) {
 		return child.bmp.intersect(w.getBitmap(T));
 	}
