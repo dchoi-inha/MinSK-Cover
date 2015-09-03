@@ -3,17 +3,14 @@
  */
 package minsk.structure;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-
-import minsk.brtree.BEntry;
 
 /**
  * @author Dong-Wan Choi
  * @date 2014. 9. 17.
  */
-public class Dataset extends ArrayList<STObject>{
+public class Dataset extends Group{
 	public Dataset()
 	{
 		super(); 
@@ -30,6 +27,7 @@ public class Dataset extends ArrayList<STObject>{
 		super.addAll(Arrays.asList(objs));
 	}
 	
-	
-	private static final long serialVersionUID = 1L;
+	public STObject get(int i) {
+		return super.g.get(i);
+	}
 }

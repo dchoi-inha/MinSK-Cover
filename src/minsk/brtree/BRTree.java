@@ -18,7 +18,7 @@ import minsk.structure.STObject;
  * 2015. 8. 27.
  */
 public class BRTree {
-	public static final int M = (int) Math.floor(Env.B/BEntry.size);
+	public static final int M = (int) Math.floor(Env.B/BEntry.Size);
 	public static final int m = (int) Math.floor(M * 0.5);
 	public static Words W;
 	public BNode R=null;

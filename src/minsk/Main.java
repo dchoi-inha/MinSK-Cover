@@ -28,7 +28,7 @@ public class Main {
 			Env.W = new Words();
 			Dataset db = construct("UK.txt");
 			
-			RTree rt = new RTree();
+//			RTree rt = new RTree();
 //			BRTree brt = new BRTree(Env.W);
 			InvertedFile iv = new InvertedFile();
 //			LinList list = new LinList();
@@ -43,7 +43,7 @@ public class Main {
 			System.out.println("---Indexing End");
 			
 			System.out.print("M: " + RTree.M + " m: " + RTree.m);
-			System.out.print(" objects: " + db.size() + " nodes: "+rt.nodes+" heights: "+rt.height);
+//			System.out.print(" objects: " + db.size() + " nodes: "+rt.nodes+" heights: "+rt.height);
 			System.out.println(" keywords: " + Env.W.size()+"\n");
 			
 			long cpuTimeElapsed;
@@ -89,28 +89,28 @@ public class Main {
 //				System.out.println("GKG bRtree---------------------------------" + cpuTimeElapsed/(double)1000000000);
 
 				// Greedy Keyword Group (GKG) on a virtual bR-tree
-				cpuTimeElapsed = Util.getCpuTime();
-				Group result4 = alg.GKG(T, iv);
-				result4.shrink(T);
-				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
-				System.out.print(result4);
-				System.out.println("GKG\t----------------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
-				
-				// SKECa algorithm
-				cpuTimeElapsed = Util.getCpuTime();
-				Group result5 = alg.SKECa(T, iv);
-				result5.shrink(T);
-				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
-				System.out.print(result5);
-				System.out.println("SKECa\t----------------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
-
-				// SKECa+ algorithm
-				cpuTimeElapsed = Util.getCpuTime();
-				Group result6 = alg.SKECaplus(T, iv);
-				result6.shrink(T);
-				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
-				System.out.print(result6);
-				System.out.println("SKECaplus\t--------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
+//				cpuTimeElapsed = Util.getCpuTime();
+//				Group result4 = alg.GKG(T, iv);
+//				result4.shrink(T);
+//				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
+//				System.out.print(result4);
+//				System.out.println("GKG\t----------------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
+//				
+//				// SKECa algorithm
+//				cpuTimeElapsed = Util.getCpuTime();
+//				Group result5 = alg.SKECa(T, iv);
+//				result5.shrink(T);
+//				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
+//				System.out.print(result5);
+//				System.out.println("SKECa\t----------------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
+//
+//				// SKECa+ algorithm
+//				cpuTimeElapsed = Util.getCpuTime();
+//				Group result6 = alg.SKECaplus(T, iv);
+//				result6.shrink(T);
+//				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
+//				System.out.print(result6);
+//				System.out.println("SKECaplus\t--------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
 
 				// ScaleLune algorithm
 				cpuTimeElapsed = Util.getCpuTime();

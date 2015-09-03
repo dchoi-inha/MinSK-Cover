@@ -136,5 +136,5 @@ public class BEntry {
 		}
 	};
 	
-	public static int size = 8*4+4; // double * 4 + integer * 1
+	public static int Size = 8*4+4; // double * 4 + integer * 1
 }

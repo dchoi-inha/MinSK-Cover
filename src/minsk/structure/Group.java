@@ -5,9 +5,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 
+/**
+ * Group
+ * @author Dong-Wan Choi
+ * @date 2015. 8. 28.
+ */
 public class Group implements Iterable<STObject>{
 
-	private ArrayList<STObject> g;
+	protected ArrayList<STObject> g;
 	private WordTab tab;
 	private double d = -1;
 	
@@ -70,7 +75,7 @@ public class Group implements Iterable<STObject>{
 	}
 	
 	public void shrink(HashSet<String> T) {
-		// perform fast greedy set cover
+		// perform greedy set cover
 		HashSet<String> U = new HashSet<String>(T);
 		ArrayList<STObject> tg = new ArrayList<STObject>();
 		
@@ -99,14 +104,14 @@ public class Group implements Iterable<STObject>{
 	}
 	
 	public String toString() {
-		String s="";
+		StringBuffer s = new StringBuffer();
 		
-		s += "dia: " + dia() + " n: " + size() + "\n";
-		s += "cost1: " + cost1() + " cost2: " + cost2() + "\n";
-		s += g.toString(); s+="\n";
+		s.append("dia: " + dia() + " n: " + size() + "\n");
+		s.append("cost1: " + cost1() + " cost2: " + cost2() + "\n");
+		s.append(g.toString() + "\n");
 //		for (STObject o: g) s += o.toString() + "\n";
 		
-		return s;
+		return s.toString();
 	}
 	
 }

@@ -11,6 +11,7 @@ import com.google.common.math.DoubleMath;
 import minsk.Env;
 import minsk.Words;
 import minsk.brtree.BRTree;
+import minsk.cbrtree.CBRTree;
 import minsk.docindex.InvertedFile;
 import minsk.structure.CardTab;
 import minsk.structure.Circle;
@@ -237,7 +238,7 @@ public class Algorithm {
 		return g;
 	}
 	
-	private Group fastSetCover(ArrayList<STObject> S, HashSet<String> T) {
+	private Group fastSetCover(Group S, HashSet<String> T) {
 		CardTab tb = new CardTab(); // partition
 		HashSet<String> C = new HashSet<String>(); // covered keywords so far
 		Group g = new Group();
@@ -267,16 +268,15 @@ public class Algorithm {
 				if (C.containsAll(T)) return g;
 			}
 		}
-		
 		return null;
 	}
 	public Group ScaleLune(HashSet<String> T, InvertedFile iv) {
 		Dataset db = iv.filter(T);
 		Words w = new Words(T);
-		BRTree brt = new BRTree(w);
+		CBRTree crt = new CBRTree(w);
 		CardTab htb = new CardTab();
 		for (STObject o: db) {
-			brt.insert(o);
+			crt.insert(o);
 			htb.add(o);
 		}
 		
@@ -284,11 +284,47 @@ public class Algorithm {
 		int kLB;
 		double rLB;
 		
-		gr = GKG(T, brt, iv, w); rLB = gr.dia()*0.5;
-		gk = fastSetCover(db, T); kLB = (int) Math.ceil((double)gk.size()/(Math.log(T.size())+1));
+		gr = GKG(T, crt, iv, w); 
+		rLB = gr.dia()*0.5;
+		gk = fastSetCover(db, T); 
+		kLB = (int) Math.ceil((double)gk.size()/(Math.log(T.size())+1));
 		
 		System.out.println("rLB: " + rLB + " kLB: " + kLB + " costLB: " + rLB*kLB);
 		
 		return gk;
+	}
+	
+	private Group GKG(HashSet<String> T, CBRTree crt, InvertedFile iv, Words w){
+		Group g = null;
+		
+		double mind = Double.MAX_VALUE;
+		
+		String t_inf = null;
+		int minf = Integer.MAX_VALUE;
+		for (String t: T) {
+			if (iv.freq(t) < minf) {
+				minf = iv.freq(t);
+				t_inf = t;
+			}
+		}
+		
+		TreeMultiset<STObject> postings = iv.getList(t_inf);
+		
+		for (STObject o: postings) {
+			Group tg = new Group();
+			tg.add(o);
+			
+			HashSet<String> ucSet = new HashSet<String>(T);
+			ucSet.removeAll(o.text);
+			tg.addAll(crt.textNNSearch(o.loc, ucSet, w));
+			double dia = tg.dia();
+			
+			if (mind > dia) {
+				mind = dia;
+				g = tg;
+			}
+		}
+		
+		return g;
 	}
 }
