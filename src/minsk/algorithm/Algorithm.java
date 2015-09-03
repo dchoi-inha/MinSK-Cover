@@ -1,15 +1,18 @@
 package minsk.algorithm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import com.google.common.collect.TreeMultiset;
+import com.google.common.math.DoubleMath;
 
 import minsk.Env;
 import minsk.Words;
 import minsk.brtree.BRTree;
 import minsk.docindex.InvertedFile;
+import minsk.structure.CardTab;
 import minsk.structure.Circle;
 import minsk.structure.Dataset;
 import minsk.structure.Group;
@@ -19,7 +22,7 @@ import minsk.util.PairObject;
 import minsk.util.Util;
 
 public class Algorithm {
-	public Group GKG(HashSet<String> T, BRTree brt, InvertedFile iv, Words w){
+	private Group GKG(HashSet<String> T, BRTree brt, InvertedFile iv, Words w){
 		Group g = null;
 		
 		double mind = Double.MAX_VALUE;
@@ -52,10 +55,9 @@ public class Algorithm {
 		
 		return g;
 	}
-	
 	public Group GKG(HashSet<String> T, InvertedFile iv) {
-		Dataset db = iv.dataset(T);
 		Words w = new Words(T);
+		Dataset db = iv.getRelevantDB(T, w);
 		BRTree brt = new BRTree(w);
 		for (STObject o: db) {
 			brt.insert(o);
@@ -163,8 +165,8 @@ public class Algorithm {
 		return g;
 	}
 	public Group SKECa(HashSet<String> T, InvertedFile iv) {
-		Dataset db = iv.dataset(T);
 		Words w = new Words(T);
+		Dataset db = iv.getRelevantDB(T, w);
 		BRTree brt = new BRTree(w);
 		for (STObject o: db) {
 			brt.insert(o);
@@ -172,7 +174,7 @@ public class Algorithm {
 		
 		Group g = GKG(T, brt, iv, w);
 		Circle c = Util.findSec(g);
-		double alpha = g.dia()*0.5*Env.ep;
+		double alpha = g.dia()*0.5*Env.Ep;
 		Group tg;
 		for (STObject o : db) {
 			if (o.text.containsAll(T)) return new Group(o);
@@ -186,8 +188,8 @@ public class Algorithm {
 	}
 	
 	public Group SKECaplus(HashSet<String> T, InvertedFile iv) {
-		Dataset db = iv.dataset(T);
 		Words w = new Words(T);
+		Dataset db = iv.getRelevantDB(T, w);
 		BRTree brt = new BRTree(w);
 		for (STObject o: db) {
 			brt.insert(o);
@@ -201,7 +203,7 @@ public class Algorithm {
 		
 		g = GKG(T, brt, iv, w);
 		c = Util.findSec(g);
-		alpha = g.dia()*0.5*Env.ep;		
+		alpha = g.dia()*0.5*Env.Ep;		
 		searchUB = c.dia();
 		searchLB = g.dia() * 0.5;
 		
@@ -235,17 +237,58 @@ public class Algorithm {
 		return g;
 	}
 	
-//	public static void main (String [] args) {
-//		Algorithm alg = new Algorithm();
-//		STObject obj = new STObject(0, 2, 2);
-//		STObject o = new STObject(1, 0, 2);
-//		double diam = 3.0;
-//		
-//		double thetaIn, thetaOut;
-//		thetaOut = alg.getOutAngle(obj, diam, o);			
-//		thetaIn = alg.getInAngle(obj, diam, o);
-//		
-//		System.out.println("out: " + thetaOut + " in: " + thetaIn);
-//		
-//	}
+	private Group fastSetCover(ArrayList<STObject> S, HashSet<String> T) {
+		CardTab tb = new CardTab(); // partition
+		HashSet<String> C = new HashSet<String>(); // covered keywords so far
+		Group g = new Group();
+		
+		// partition the sets into sub-collections
+		for (STObject o: S) tb.add(o);
+		
+		// start covering elements
+		double k, pk;
+		int diff;
+		for (int card = tb.max; card >= 1; card--) {
+			if (!tb.containsKey(card)) continue;
+			
+			k = (int) Math.floor(DoubleMath.log2(card)/DoubleMath.log2(Env.P));
+			pk = Math.pow(Env.P, k); // p^k
+			HashSet<STObject> cardSet = tb.get(card);
+			for (STObject o: cardSet) {
+				diff = o.diffCnt(C); // |o.\tau - C|
+				if (diff >= pk) {
+					g.add(o);
+					C.addAll(o.text);
+				} else {
+//					cardSet.remove(o);
+					if (diff > 0) tb.add(o, diff);
+				}
+				
+				if (C.containsAll(T)) return g;
+			}
+		}
+		
+		return null;
+	}
+	public Group ScaleLune(HashSet<String> T, InvertedFile iv) {
+		Dataset db = iv.filter(T);
+		Words w = new Words(T);
+		BRTree brt = new BRTree(w);
+		CardTab htb = new CardTab();
+		for (STObject o: db) {
+			brt.insert(o);
+			htb.add(o);
+		}
+		
+		Group gr, gk;
+		int kLB;
+		double rLB;
+		
+		gr = GKG(T, brt, iv, w); rLB = gr.dia()*0.5;
+		gk = fastSetCover(db, T); kLB = (int) Math.ceil((double)gk.size()/(Math.log(T.size())+1));
+		
+		System.out.println("rLB: " + rLB + " kLB: " + kLB + " costLB: " + rLB*kLB);
+		
+		return gk;
+	}
 }

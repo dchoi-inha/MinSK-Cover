@@ -34,7 +34,7 @@ public class BRTree {
 			R = n;
 			height++;
 		}
-		W = words; // This is somewhat not appropriate, but I had no time....
+		BRTree.W = words; // This static value is somewhat not good, but I had no time....
 	}
 
 	/* Search */

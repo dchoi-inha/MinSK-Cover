@@ -138,10 +138,10 @@ public class Util {
 	
 	public static HashSet<String> rand(int l, Words w, InvertedFile iv, Dataset db) {
 		HashSet<String> T = new HashSet<String>();
-		Random r = new Random();
+		Random r = new Random(1);
 		for (int i = 0; i < l; i++) {
 			String s = w.words.get(r.nextInt(w.words.size()));
-			if (T.contains(s) || (iv.freq(s) < Env.PF*(double)db.size())) {
+			if (T.contains(s) || (iv.freq(s) < Env.FreqRate*(double)db.size())) {
 				i--;
 			} else T.add(s);
 		}

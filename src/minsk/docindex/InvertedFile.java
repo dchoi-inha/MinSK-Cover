@@ -8,6 +8,7 @@ import java.util.TreeSet;
 
 import com.google.common.collect.TreeMultiset;
 
+import minsk.Words;
 import minsk.structure.Dataset;
 import minsk.structure.STObject;
 
@@ -46,7 +47,35 @@ public class InvertedFile {
 		return map.size();
 	}
 
-	public Dataset dataset(HashSet<String> T) {
+	
+	/**
+	 * This method only gets the relevant objects to T 
+	 * without removing irrelevant keywords
+	 */
+	public Dataset getRelevantDB(HashSet<String> T, Words w) {
+		HashMap<Integer, STObject> tmp = new HashMap<Integer, STObject>();
+		
+		for (String t: T) {
+			TreeMultiset<STObject> list = getList(t);
+			for (STObject o: list) {
+				if (!tmp.containsKey(o.id)) {
+					w.add(o);
+					tmp.put(o.id, o);
+				} 
+			}
+		}
+		return new Dataset(tmp.values());
+	}
+
+
+	/**
+	 * This method does the followings:
+	 * (1) filter the objects having at least one keyword in T
+	 * (2) remove all irrelevant keywords from objects
+	 * @param T, the set of query keywords
+	 * @return the set of all relevant objects to T
+	 */
+	public Dataset filter(HashSet<String> T) {
 		HashMap<Integer, STObject> tmp = new HashMap<Integer, STObject>();
 		STObject a;
 		
@@ -63,6 +92,5 @@ public class InvertedFile {
 			}
 		}
 		return new Dataset(tmp.values());
-
 	}
 }

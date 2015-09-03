@@ -29,14 +29,14 @@ public class Main {
 			Dataset db = construct("UK.txt");
 			
 			RTree rt = new RTree();
-			BRTree brt = new BRTree(Env.W);
+//			BRTree brt = new BRTree(Env.W);
 			InvertedFile iv = new InvertedFile();
 //			LinList list = new LinList();
 
 			System.out.print("Indexing Start");
 			for (STObject o: db) {
 //				rt.insert(o);
-				brt.insert(o);
+//				brt.insert(o);
 				iv.add(o);
 //				list.add(o);
 			}
@@ -48,16 +48,11 @@ public class Main {
 			
 			long cpuTimeElapsed;
 			
-			int k = 1, l = 40;
-			for (int i = 0; i<1; i++){
-				// generate random query
-				double x = Math.random();
-				double y = Math.random();
-				Point q = new Point(x,	y);
-//				Point q = new Point(0.504,	0.217);
+			int k = 1, l = 12;
+			for (int i = 1; i<=1; i++){
 				HashSet<String> T = Util.rand(l, Env.W, iv, db);
 //				HashSet<String> T = new HashSet<String>(Arrays.asList(new String [] {"Car", "Link", "Crescent", "Londonderry"}));
-				System.out.println("q:" + q + "  T:" + T + "\n");
+				System.out.println("T:" + T + "\n");
 
 				// list knn search
 //				cpuTimeElapsed = Util.getCpuTime();
@@ -99,7 +94,7 @@ public class Main {
 				result4.shrink(T);
 				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
 				System.out.print(result4);
-				System.out.println("GKG vir-bRtree------------------------------" + cpuTimeElapsed/(double)1000000000);
+				System.out.println("GKG\t----------------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
 				
 				// SKECa algorithm
 				cpuTimeElapsed = Util.getCpuTime();
@@ -107,7 +102,7 @@ public class Main {
 				result5.shrink(T);
 				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
 				System.out.print(result5);
-				System.out.println("SKECa--------------------------------------" + cpuTimeElapsed/(double)1000000000);
+				System.out.println("SKECa\t----------------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
 
 				// SKECa+ algorithm
 				cpuTimeElapsed = Util.getCpuTime();
@@ -115,13 +110,19 @@ public class Main {
 				result6.shrink(T);
 				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
 				System.out.print(result6);
-				System.out.println("SKECaplus+++++++++++++++++++++++++++++++++++" + cpuTimeElapsed/(double)1000000000);
+				System.out.println("SKECaplus\t--------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
 
+				// ScaleLune algorithm
+				cpuTimeElapsed = Util.getCpuTime();
+				Group result7 = alg.ScaleLune(T, iv);
+				result7.shrink(T);
+				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
+				System.out.print(result7);
+				System.out.println("ScaleLune\t---------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
 				
 				
-				
-				if (!(result4.covers(T) && result5.covers(T) && result6.covers(T)))
-					System.err.println("result does not cover T");
+//				if (!(result4.covers(T) && result5.covers(T) && result6.covers(T)) && result7.covers(T))
+//					System.err.println("result does not cover T");
 				
 				
 				System.out.println("\n");

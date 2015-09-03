@@ -51,8 +51,12 @@ public class STObject {
 	public int interCnt(HashSet<String> T) {
 		HashSet<String> tmp = new HashSet<String>(T);
 		tmp.retainAll(text);
-		
+
 		return tmp.size();
+	}
+	
+	public int diffCnt(HashSet<String> T) {
+		return text.size() - interCnt(T);
 	}
 	
 
@@ -85,7 +89,7 @@ public class STObject {
 		public int compare(STObject o1, STObject o2) {
 			if (o1.loc.x == o2.loc.x && o1.loc.y != o2.loc.y) return (o1.loc.y - o2.loc.y > 0? 1 : -1);
 			else if (o1.loc.x != o2.loc.x) return (o1.loc.x - o2.loc.x>0? 1: -1);
-			else return 0;
+			else return (o1.id - o2.id);
 		}
 	};
 }

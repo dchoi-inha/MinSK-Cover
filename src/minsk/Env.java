@@ -13,11 +13,13 @@ public class Env {
 	
 	public static double MaxCoord = 1.0;
 	
-	public static final int B = 1024; // bytes
+	public static final int B = 1024; // block size in bytes
 
-	public static Words W = new Words();
+	public static Words W = new Words(); // words class having all the keywords
 
-	public static double ep = 0.01;
+	public static double Ep = 0.01; // epsilon parameter for SKECa
 	
-	public static final double PF = 0.01;
+	public static final double FreqRate = 0.01; // ratio of frequency of each query keyword to n
+	
+	public static final double P = 1.5; // p parameter for fast Set Cover algorithm
 }

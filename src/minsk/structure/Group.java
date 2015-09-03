@@ -61,22 +61,6 @@ public class Group implements Iterable<STObject>{
 		g.addAll(c);
 	}
 
-	@Override
-	public Iterator<STObject> iterator() {
-		return g.iterator();
-	}
-	
-	public String toString() {
-		String s="";
-		
-		s += "dia: " + dia() + " n: " + size() + "\n";
-		s += "cost1: " + cost1() + " cost2: " + cost2() + "\n";
-		s += g.toString(); s+="\n";
-//		for (STObject o: g) s += o.toString() + "\n";
-		
-		return s;
-	}
-	
 	public boolean covers(HashSet<String> T) {
 		if (tab == null) {
 			tab = new WordTab();
@@ -86,7 +70,7 @@ public class Group implements Iterable<STObject>{
 	}
 	
 	public void shrink(HashSet<String> T) {
-		// naive greedy set cover
+		// perform fast greedy set cover
 		HashSet<String> U = new HashSet<String>(T);
 		ArrayList<STObject> tg = new ArrayList<STObject>();
 		
@@ -107,6 +91,22 @@ public class Group implements Iterable<STObject>{
 		}
 		g = tg;
 		tab = null;
+	}
+	
+	@Override
+	public Iterator<STObject> iterator() {
+		return g.iterator();
+	}
+	
+	public String toString() {
+		String s="";
+		
+		s += "dia: " + dia() + " n: " + size() + "\n";
+		s += "cost1: " + cost1() + " cost2: " + cost2() + "\n";
+		s += g.toString(); s+="\n";
+//		for (STObject o: g) s += o.toString() + "\n";
+		
+		return s;
 	}
 	
 }
