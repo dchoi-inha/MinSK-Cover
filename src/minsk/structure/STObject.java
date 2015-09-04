@@ -4,6 +4,7 @@ package minsk.structure;
 import java.util.Comparator;
 import java.util.HashSet;
 
+import minsk.polartree.RBItem;
 import minsk.rtree.Entry;
 
 
@@ -93,4 +94,5 @@ public class STObject {
 			else return (o1.id - o2.id);
 		}
 	};
+
 }

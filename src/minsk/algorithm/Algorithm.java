@@ -23,6 +23,7 @@ import minsk.structure.Group;
 import minsk.structure.Lune;
 import minsk.structure.STObject;
 import minsk.structure.WordTab;
+import minsk.util.Debug;
 import minsk.util.PairObject;
 import minsk.util.Util;
 
@@ -331,15 +332,15 @@ public class Algorithm {
 		rLB = gr.dia()*0.5;
 //		rLB = gr.dia();
 		gk = fastSetCover(db, T); 
-//		kLB = (int) Math.ceil((double)gk.size()/(Math.log(T.size())+1));
-		kLB = gk.size();
+		kLB = (int) Math.ceil((double)gk.size()/(Math.log(T.size())+1));
+//		kLB = gk.size();
 		if (gr.cost1() > gk.cost1()) {
 			g = gk; fmin = gk.cost1();
 		} else {
 			g = gr; fmin = gr.cost1();
 		}
 		
-		System.out.println("rLB: " + rLB + " kLB: " + kLB + " costLB: " + rLB*kLB);
+		Debug._PrintL("rLB: " + rLB + " kLB: " + kLB + " costLB: " + rLB*kLB);
 		
 		// from Line 7 in Algorithm 2
 		for (int l = htb.max; l >= 1; l--) {
@@ -401,7 +402,7 @@ public class Algorithm {
 			g = gr; fmin = gr.cost1();
 		}
 		
-		System.out.println("rLB: " + rLB + " kLB: " + kLB + " costLB: " + rLB*kLB);
+		Debug._PrintL("rLB: " + rLB + " kLB: " + kLB + " costLB: " + rLB*kLB);
 		
 		// from Line 7 in Algorithm 2
 		for (int l = htb.max; l >= 1; l--) {

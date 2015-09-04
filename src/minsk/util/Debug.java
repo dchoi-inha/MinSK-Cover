@@ -14,7 +14,7 @@ import minsk.Env;
  */
 public class Debug {
 	
-	public static boolean flag = true;
+	public static boolean flag = false;
 	private static final String logFileName = Env.HomeDir + "/logs/minsk.log";
 	
 	public static void _PrintL(String str) {
@@ -30,7 +30,7 @@ public class Debug {
 			}
 		}
 	}
-	public static void _Print(String str) {
+	public static void _Print(Object str) {
 		if (flag) System.out.print(str);
 		else {
 			try {
@@ -43,7 +43,7 @@ public class Debug {
 			}
 		}
 	}
-	public static void _Error(Object object, String str) {
+	public static void _Error(Object object, Object str) {
 		if (object != null)
 			if (flag) System.err.println("Error:" + str + " in "+object.getClass().getSimpleName());
 			else {

@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import minsk.structure.*;
+import minsk.util.Debug;
 import minsk.util.Util;
 import minsk.algorithm.Algorithm;
 import minsk.brtree.*;
@@ -27,6 +28,7 @@ public class Main {
 			Algorithm alg = new Algorithm();
 			Env.W = new Words();
 			Dataset db = construct("UK.txt");
+			int cnt = 10, l = 10;
 			
 //			RTree rt = new RTree();
 //			BRTree brt = new BRTree(Env.W);
@@ -44,64 +46,80 @@ public class Main {
 			
 			System.out.print("M: " + RTree.M + " m: " + RTree.m);
 //			System.out.print(" objects: " + db.size() + " nodes: "+rt.nodes+" heights: "+rt.height);
-			System.out.println(" keywords: " + Env.W.size()+"\n");
+			System.out.println(" keywords: " + Env.W.size() + " |T|: " + l+"\n");
 			
 			long cpuTimeElapsed;
 			
-			double e1 = 0, e2 = 0, e3 = 0;
-			double t1 = 0, t2 = 0, t3 = 0;
+			String [] a = new String[]{"GKG", "SKECa+", "ScaleLune(w/o PT)"};
+			double [] c1 = new double[a.length]; 
+			double [] c1max = new double[]{Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE};
+			double [] c2 = new double[a.length];
+			double [] c2max = new double[]{Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE};
+			double [] t = new double[a.length];
+			Group [] result = new Group[a.length];
 			
-			int m = 10, l = 10;
-			for (int i = 1; i<=m; i++){
+			for (int i = 0; i < cnt; i++){
+				System.out.print(i+" ");
+
 				HashSet<String> T = Util.rand(l, Env.W, iv, db);
 //				HashSet<String> T = new HashSet<String>(Arrays.asList(new String [] {"Car", "Link", "Crescent", "Londonderry"}));
-				System.out.println("T:(" + T.size() + ")" + T + "\n");
+				Debug._PrintL("T:(" + T.size() + ")" + T + "\n");
 
 				// Greedy Keyword Group (GKG) on a virtual bR-tree
 				cpuTimeElapsed = Util.getCpuTime();
-				Group result1 = alg.GKG(T, iv);
-				result1.shrink(T);
-				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed; t1 += cpuTimeElapsed;
-				System.out.print(result1);
-				System.out.println("GKG\t----------------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
+				result[0] = alg.GKG(T, iv);
+				result[0].shrink(T);
+				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed; t[0] += cpuTimeElapsed/(double)1000000000;
+				Debug._Print(result[0]);
+				Debug._PrintL("GKG\t----------------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
 				
 				// SKECa algorithm
 //				cpuTimeElapsed = Util.getCpuTime();
 //				Group result5 = alg.SKECa(T, iv);
 //				result5.shrink(T);
 //				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
-//				System.out.print(result5);
-//				System.out.println("SKECa\t----------------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
+//				Debug._Print(result5);
+//				Debug._PrintL("SKECa\t----------------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
 
 				// SKECa+ algorithm
 				cpuTimeElapsed = Util.getCpuTime();
-				Group result2 = alg.SKECaplus(T, iv);
-				result2.shrink(T);
-				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed; t2 += cpuTimeElapsed;
-				System.out.print(result2);
-				System.out.println("SKECaplus\t--------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
+				result[1] = alg.SKECaplus(T, iv);
+				result[1].shrink(T);
+				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed; t[1] += cpuTimeElapsed/(double)1000000000;
+				Debug._Print(result[1]);
+				Debug._Print("SKECaplus\t--------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
 
 				// ScaleLuneCartesian algorithm
 				cpuTimeElapsed = Util.getCpuTime();
-				Group result3 = alg.ScaleLuneCartesian(T, iv);
-				result3.shrink(T);
-				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed; t3 += cpuTimeElapsed;
-				System.out.print(result3);
-				System.out.println("ScaleLuneCartesian\t-----------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
+				result[2] = alg.ScaleLuneCartesian(T, iv);
+				result[2].shrink(T);
+				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed; t[2] += cpuTimeElapsed/(double)1000000000;
+				Debug._Print(result[2]);
+				Debug._Print("ScaleLuneCartesian\t-----------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
 				
 				
-				e1 += result1.cost1(); e2 += result2.cost1(); e3 += result3.cost1();
-				
-				if (!(result1.covers(T) && result2.covers(T) && result3.covers(T)))
-					System.err.println("result does not cover T");
-				
-				
-				System.out.println("\n");
+				for (int j = 0; j < result.length; j++) {
+					c1[j] += result[j].cost1();
+					c2[j] += result[j].cost2();
+					c1max[j] = Math.max(c1max[j], result[j].cost1());
+					c2max[j] = Math.max(c2max[j], result[j].cost2());
+					
+					if (!result[j].covers(T)) {
+						System.err.println("result does not cover T");
+						System.err.println(result[j]);
+						System.exit(0);
+					}
+				}
+
+				Debug._Print("\n");
 			}
-			
-			System.out.println(" \t GKG \t SKECaplus \t ScaleLuneCart\t");
-			System.out.println("time \t" + t1/m + " \t " + t2/m + " \t " + t3/m + " \t ");
-			System.out.println("cost \t" + e1/m + " \t " + e2/m + " \t " + e3/m + " \t ");
+			System.out.println();
+			System.out.format("%-10s%-20s%-20s%-20s\n", "", a[0], a[1], a[2]);
+			System.out.format("%-10s%-20f%-20f%-20f\n", "time avg.", t[0]/cnt, t[1]/cnt, t[2]/cnt);
+			System.out.format("%-10s%-20f%-20f%-20f\n", "cost1 avg.", c1[0]/cnt, c1[1]/cnt, c1[2]/cnt);
+			System.out.format("%-10s%-20f%-20f%-20f\n", "cost2 avg.", c2[0]/cnt, c2[1]/cnt, c2[2]/cnt);
+			System.out.format("%-10s%-20f%-20f%-20f\n", "cost1 max", c1max[0], c1max[1], c1max[2]);
+			System.out.format("%-10s%-20f%-20f%-20f\n", "cost2 max", c2max[0], c2max[1], c2max[2]);
 
 			
 		} catch (IOException e) {
