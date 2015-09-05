@@ -218,16 +218,16 @@ public class CBRTree {
 		while ((next=pq.poll()) != null)
 		{
 			if (next instanceof CLEntry) { // point
-				if (next.minCard() <= len && !((CLEntry)next).obj.checked) break;
+				if (/*next.minCard() <= len &&*/ !((CLEntry)next).obj.checked) break;
 				else continue;
 			}
 			else {
 				for(int i = 0; i < next.child.size(); i++) { // node
 					CEntry e = next.child.get(i);
-					if (e.minCard() <= len) {
+//					if (e.minCard() <= len) {
 						e.dist = e.distTo(q);
 						pq.add(e);
-					}
+//					}
 				}
 			}
 		}

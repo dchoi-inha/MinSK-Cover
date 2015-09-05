@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.TreeSet;
 
+import minsk.Words;
 import minsk.structure.STObject;
 import minsk.util.Util;
 
@@ -22,21 +23,21 @@ public class RBTreeTester {
 
 		int len = 1000000;
 		RBItem [] items = new RBItem[len];
-		RBTree pt = new RBTree();
 		TreeSet<RBItem> treeSet = new TreeSet<RBItem>(RBItem.ComparePolar);
 		HashSet<RBItem> hashSet = new HashSet<RBItem>();
-		Random rand = new Random();
-		HashSet<String> T = new HashSet<String>(Arrays.asList(new String [] {"Car", "Link", "Crescent", "Londonderry"}));
+		Random rand = new Random(3);
+		HashSet<String> T = new HashSet<String>(Arrays.asList(new String [] {"1", "2", "3", "4", "5", "6"}));
 		STObject obj = new STObject(1, 0.2, 0.4, T);
-
+		Words w = new Words(T);
+		RBTree pt = new RBTree(w, obj);
 		
 		for (int i=0; i < len; i++) {
-			items[i] = new RBItem(rand.nextInt(360)+rand.nextDouble(), obj);
+			items[i] = new RBItem(rand.nextInt(360)+rand.nextDouble(), obj, 0);
 		}
 		
 		cpuTimeElapsed = Util.getCpuTime();
 		for (int i=0; i < len; i++) {
-			pt.insert(items[i], T);
+			pt.insert(items[i]);
 		}
 		cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;		
 		System.out.println("time for rb-tree: " + cpuTimeElapsed/(double)1000000000 + "secs");
@@ -54,11 +55,8 @@ public class RBTreeTester {
 		}
 		cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;		
 		System.out.println("time for HashSet: " + cpuTimeElapsed/(double)1000000000 + "secs");
-
 		
-//		for (int i=0; i < len; i++) {
-//			System.out.println(i + ": " + pt.get(i));
-//		}
 		
+		pt.printTree();
 	}
 }

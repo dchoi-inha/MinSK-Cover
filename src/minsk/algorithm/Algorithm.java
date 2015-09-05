@@ -16,6 +16,7 @@ import minsk.brtree.BRTree;
 import minsk.cbrtree.CBRTree;
 import minsk.cbrtree.CEntry;
 import minsk.docindex.InvertedFile;
+import minsk.polartree.RBTree;
 import minsk.structure.CardTab;
 import minsk.structure.Circle;
 import minsk.structure.Dataset;
@@ -332,68 +333,6 @@ public class Algorithm {
 		rLB = gr.dia()*0.5;
 //		rLB = gr.dia();
 		gk = fastSetCover(db, T); 
-		kLB = (int) Math.ceil((double)gk.size()/(Math.log(T.size())+1));
-//		kLB = gk.size();
-		if (gr.cost1() > gk.cost1()) {
-			g = gk; fmin = gk.cost1();
-		} else {
-			g = gr; fmin = gr.cost1();
-		}
-		
-		Debug._PrintL("rLB: " + rLB + " kLB: " + kLB + " costLB: " + rLB*kLB);
-		
-		// from Line 7 in Algorithm 2
-		for (int l = htb.max; l >= 1; l--) {
-			for (STObject o: htb.get(l)) {
-//				System.out.println(o); 
-				o.checked = true;
-				PriorityQueue<CEntry> pq = crt.initPQ(o);
-				STObject nn = crt.nextNN(o, pq);
-				int i = 0;
-				while(nn != null && o.loc.distance(nn.loc) < fmin/(double)kLB) {
-					if (Math.ceil(T.size()/l)*rLB >= fmin)
-						return g;
-					
-					Lune lune = new Lune(o.loc, nn.loc);
-					gl = crt.luneRangeSearch(lune);
-					if (gl.covers(T)) {
-						gl = fastSetCover(gl, T);
-						if (gl.size()*lune.width() < g.cost1()) {
-							fmin = gl.size()*lune.width();
-//						if (gl.cost1() < fmin) {
-//							fmin = gl.cost1();
-							g = gl;
-						}
-					}
-					nn = crt.nextNN(o, pq);
-					i++;
-				}
-//				System.out.println("# NNs: " + i + "\n");
-			}
-		}
-		
-		return g;
-	}
-	
-	public Group ScaleLunePolar(HashSet<String> T, InvertedFile iv) {
-		Dataset db = iv.filter(T);
-		Words w = new Words(T);
-		CBRTree crt = new CBRTree(w);
-		CardTab htb = new CardTab();
-		for (STObject o: db) {
-			crt.insert(o);
-			htb.add(o);
-		}
-		
-		Group gr, gk, gl, g;
-		int kLB;
-		double rLB, fmin;
-		
-		// Lines 5 - 6
-		gr = GKG4ScaleLune(T, crt, iv, w); 
-//		rLB = gr.dia()*0.5;
-		rLB = gr.dia();
-		gk = fastSetCover(db, T); 
 //		kLB = (int) Math.ceil((double)gk.size()/(Math.log(T.size())+1));
 		kLB = gk.size();
 		if (gr.cost1() > gk.cost1()) {
@@ -420,10 +359,10 @@ public class Algorithm {
 					gl = crt.luneRangeSearch(lune);
 					if (gl.covers(T)) {
 						gl = fastSetCover(gl, T);
-						if (gl.size()*lune.width() < g.cost1()) {
-							fmin = gl.size()*lune.width();
-//						if (gl.cost1() < fmin) {
-//							fmin = gl.cost1();
+//						if (gl.size()*lune.width() < fmin) {
+//							fmin = gl.size()*lune.width();
+						if (gl.cost1() < fmin) {
+							fmin = gl.cost1();
 							g = gl;
 						}
 					}
@@ -431,6 +370,84 @@ public class Algorithm {
 					i++;
 				}
 //				System.out.println("# NNs: " + i + "\n");
+			}
+		}
+		
+		return g;
+	}
+	
+	public Group ScaleLunePolar(HashSet<String> T, InvertedFile iv) {
+		Dataset db = iv.filter(T);
+		Words w = new Words(T);
+		CBRTree crt = new CBRTree(w);
+		CardTab htb = new CardTab();
+		for (STObject o: db) {
+			crt.insert(o);
+			htb.add(o);
+		}
+		
+		Group gr, gk, gl, g;
+		int kLB;
+		double rLB, fmin;
+		Boolean isCovering;
+		
+		// Lines 5 - 6
+		gr = GKG4ScaleLune(T, crt, iv, w); 
+		rLB = gr.dia()*0.5;
+//		rLB = gr.dia();
+		gk = fastSetCover(db, T); 
+//		kLB = (int) Math.ceil((double)gk.size()/(Math.log(T.size())+1));
+		kLB = gk.size();
+		if (gr.cost1() > gk.cost1()) {
+			g = gk; fmin = gk.cost1();
+		} else {
+			g = gr; fmin = gr.cost1();
+		}
+		
+		Debug._PrintL("rLB: " + rLB + " kLB: " + kLB + " costLB: " + rLB*kLB);
+		
+		// from Line 7 in Algorithm 2
+		for (int l = htb.max; l >= 1; l--) {
+			for (STObject o: htb.get(l)) {
+				o.checked = true;
+				RBTree pt = new RBTree(w, o);
+				PriorityQueue<CEntry> pq = crt.initPQ(o);
+				STObject nn = crt.nextNN(o, pq);
+				while(nn != null && o.loc.distance(nn.loc) < fmin/(double)kLB) {
+					isCovering = pt.insert(nn);
+					if (Math.ceil(T.size()/l)*rLB >= fmin)
+						return g;
+					
+					if (isCovering == null || isCovering.equals(true)) {
+						Lune lune = new Lune(o.loc, nn.loc);
+						gl = pt.rangeSearch(nn);
+						Group gl2 = crt.luneRangeSearch(lune);
+						
+						if (gl.size() != gl2.size()) {
+							System.out.println(gl);
+							System.out.println(gl2);
+							
+							pt.printTree();
+							
+							System.out.println(o);
+							System.out.println(nn);
+							System.exit(0);
+						}
+						
+						if (isCovering == null)
+							isCovering = gl.covers(T);
+						if (isCovering.equals(true)) {
+							gl = fastSetCover(gl, T);
+//							if (gl.size()*lune.width() < fmin) {
+//								fmin = gl.size()*lune.width();
+								if (gl.cost1() < fmin) {
+								fmin = gl.cost1();
+								g = gl;
+							}
+						}
+					}
+					nn = crt.nextNN(o, pq);
+				}
 			}
 		}
 		

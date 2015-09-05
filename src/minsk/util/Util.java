@@ -160,12 +160,12 @@ public class Util {
 	}
 	
 	
-	public static void main(String [] args) {
-		
-		Point origin = new Point(2, 2);
-		Point target = new Point(4, 1.9);
-		
-		System.out.println(getAngle(origin, target));
-		
-	}
+//	public static void main(String [] args) {
+//		
+//		Point origin = new Point(2, 2);
+//		Point target = new Point(4, 1.9);
+//		
+//		System.out.println(getAngle(origin, target));
+//		
+//	}
 }

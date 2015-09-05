@@ -3,7 +3,11 @@ package minsk.polartree;
 import java.util.Comparator;
 import java.util.HashSet;
 
+
+import minsk.cbrtree.CLEntry;
+import minsk.structure.Range;
 import minsk.structure.STObject;
+import minsk.util.Bitmap;
 
 
 /**
@@ -14,23 +18,20 @@ import minsk.structure.STObject;
  */
 public class RBItem {
 
-	double ang; // angle
-	double minAng, maxAng; // angle range
-	double dist;
-	HashSet<String> keywords;	
-	STObject obj;
+	public double ang; // angle
+	public Range rng;
+	public double dist;
+	public Bitmap treebmp; // keyword bitmap for its subtree
+	public Bitmap objbmp; // keyword bitmap for its own object (never change)
+	public STObject obj;
 	
-	public RBItem() {
-		minAng = Double.MAX_VALUE;
-		maxAng = Double.MIN_VALUE;
-	}
-	
-	public RBItem(double theta, STObject o) {
+	public RBItem(double theta, STObject o, double d) {
 		ang = theta;
-		minAng = Double.MAX_VALUE;
-		maxAng = Double.MIN_VALUE;
-		keywords = new HashSet<String>();
+		rng = new Range(ang, ang);
 		obj = o;
+		dist = d;
+		objbmp = new Bitmap(RBTree.W.getBitmap(obj.text));
+		treebmp = new Bitmap(objbmp);
 	}
 	
 	public double getKey() {
@@ -45,20 +46,48 @@ public class RBItem {
 		}
 	};
 	
+	public boolean coversWith(RBItem item) {
+		Bitmap tmp = new Bitmap(treebmp);
+		tmp.or(item.objbmp);
+		tmp.or(RBTree.polebmp);
+		return tmp.isAllSet();
+	}
+	
 	public String toString() {
 		StringBuffer sb = new StringBuffer();
+		sb.append(obj.id);
 		sb.append("("+ang+")");
-		sb.append("["+minAng+", "+maxAng+"]");
-		sb.append(keywords);
+		sb.append(rng);
+		sb.append(objbmp+ " | ");
+		sb.append(treebmp);
 		return sb.toString();
 	}
 	
-	public boolean update(RBItem item, HashSet<String> T) {
-		minAng = Math.min(minAng, item.ang);
-		maxAng = Math.max(maxAng, item.ang);
-		keywords.addAll(item.obj.text);
+	public void update(RBItem item) {
+		rng.l = Math.min(rng.l, item.ang);
+		rng.h = Math.max(rng.h, item.ang);
 		
-		return (keywords.containsAll(T));
+		if (treebmp == null) treebmp = new Bitmap(objbmp);
+		treebmp.or(item.objbmp);
 	}
-
+	
+	public void update(RBItem litem, RBItem ritem) {
+		treebmp = new Bitmap(objbmp);
+		if (litem == null && ritem == null) {
+			rng.l = ang;
+			rng.h = ang;
+		} else if (litem == null) {
+			rng.l = ritem.rng.l;
+			rng.h = ritem.rng.h;
+			treebmp.or(ritem.treebmp);
+		} else if (ritem == null) {
+			rng.l = litem.rng.l;
+			rng.h = litem.rng.h;
+			treebmp.or(litem.treebmp);
+		} else {
+			rng.l = Math.min(litem.rng.l, ritem.rng.l);
+			rng.h = Math.max(litem.rng.h, ritem.rng.h);
+			treebmp.or(litem.treebmp); treebmp.or(ritem.treebmp);
+		}
+	}
 }

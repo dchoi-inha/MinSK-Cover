@@ -54,6 +54,16 @@ public class Bitmap {
 		}
 	}
 	
+	public void unsetAll() {
+		
+		for ( int i = 0; i < len/Byte.SIZE; i++ )
+			bits[i] = (byte)0x00;
+		if ( len%Byte.SIZE > 0 ) {
+			for (int pos = (len/Byte.SIZE)*Byte.SIZE; pos < len; pos++)
+				unset(pos);
+		}
+	}
+	
 	public void setAll() {
 		
 		for ( int i = 0; i < len/Byte.SIZE; i++ )
@@ -67,13 +77,33 @@ public class Bitmap {
 	public boolean intersect(Bitmap bmp) {
 		Bitmap tmp = new Bitmap(this);
 		tmp.and(bmp);
-		int index = (int) Math.ceil((double)len/(double)Byte.SIZE);
-
-		for (int i=0; i < index; i++) {
-			if (bits[i] != (byte)0x00)
-				return true;
+		
+		return !tmp.isAllUnSet();
+	}
+	
+	public boolean isAllSet() {
+		
+		for (int i=0; i < len/Byte.SIZE; i++) {
+			if (bits[i] != (byte)0xff) return false;
 		}
-		return false;
+		if ( len%Byte.SIZE > 0 ) {
+			for (int pos = (len/Byte.SIZE)*Byte.SIZE; pos < len; pos++)
+				if (!get(pos)) return false;
+		}
+		
+		return true;
+	}
+	
+	public boolean isAllUnSet() {
+		for (int i=0; i < len/Byte.SIZE; i++) {
+			if (bits[i] != (byte)0x00) return false;
+		}
+		if ( len%Byte.SIZE > 0 ) {
+			for (int pos = (len/Byte.SIZE)*Byte.SIZE; pos < len; pos++)
+				if (get(pos)) return false;
+		}
+		
+		return true;
 	}
 	
 	public void and(Bitmap bmp) {
@@ -127,6 +157,27 @@ public class Bitmap {
 			else s+= "0";
 		}
 		return s;
+	}
+	
+	public static void main(String [] args) {
+		Bitmap b1, b2;
+		
+		b1 = new Bitmap(20);
+		b2 = new Bitmap(20);
+		
+
+		b1.setAll();
+		System.out.println("b1: " + b1);
+		b1.unsetAll();
+		System.out.println("b1: " + b1);
+
+		b1.set(18); 		
+		System.out.println("b1: " + b1);
+		
+		b2.set(18);
+
+		System.out.println(b1.intersect(b2));
+
 	}
 }
 

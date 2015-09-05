@@ -50,11 +50,11 @@ public class Main {
 			
 			long cpuTimeElapsed;
 			
-			String [] a = new String[]{"GKG", "SKECa+", "ScaleLune(w/o PT)"};
+			String [] a = new String[]{"GKG", "SKECa+", "ScaleLune(w/o PT)", "ScaleLune(PT)"};
 			double [] c1 = new double[a.length]; 
-			double [] c1max = new double[]{Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE};
+			double [] c1max = new double[a.length];
 			double [] c2 = new double[a.length];
-			double [] c2max = new double[]{Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE};
+			double [] c2max = new double[a.length];
 			double [] t = new double[a.length];
 			Group [] result = new Group[a.length];
 			
@@ -97,6 +97,14 @@ public class Main {
 				Debug._Print(result[2]);
 				Debug._Print("ScaleLuneCartesian\t-----------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
 				
+				// ScaleLunePolar algorithm
+				cpuTimeElapsed = Util.getCpuTime();
+				result[3] = alg.ScaleLunePolar(T, iv);
+				result[3].shrink(T);
+				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed; t[3] += cpuTimeElapsed/(double)1000000000;
+				Debug._Print(result[3]);
+				Debug._Print("ScaleLunePolar\t-----------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
+				
 				
 				for (int j = 0; j < result.length; j++) {
 					c1[j] += result[j].cost1();
@@ -114,12 +122,12 @@ public class Main {
 				Debug._Print("\n");
 			}
 			System.out.println();
-			System.out.format("%-10s%-20s%-20s%-20s\n", "", a[0], a[1], a[2]);
-			System.out.format("%-10s%-20f%-20f%-20f\n", "time avg.", t[0]/cnt, t[1]/cnt, t[2]/cnt);
-			System.out.format("%-10s%-20f%-20f%-20f\n", "cost1 avg.", c1[0]/cnt, c1[1]/cnt, c1[2]/cnt);
-			System.out.format("%-10s%-20f%-20f%-20f\n", "cost2 avg.", c2[0]/cnt, c2[1]/cnt, c2[2]/cnt);
-			System.out.format("%-10s%-20f%-20f%-20f\n", "cost1 max", c1max[0], c1max[1], c1max[2]);
-			System.out.format("%-10s%-20f%-20f%-20f\n", "cost2 max", c2max[0], c2max[1], c2max[2]);
+			System.out.format("%-10s%-20s%-20s%-20s%-20s\n", "", a[0], a[1], a[2], a[3]);
+			System.out.format("%-10s%-20f%-20f%-20f%-20f\n", "time avg.", t[0]/cnt, t[1]/cnt, t[2]/cnt, t[3]/cnt);
+			System.out.format("%-10s%-20f%-20f%-20f%-20f\n", "cost1 avg.", c1[0]/cnt, c1[1]/cnt, c1[2]/cnt, c1[3]/cnt);
+			System.out.format("%-10s%-20f%-20f%-20f%-20f\n", "cost2 avg.", c2[0]/cnt, c2[1]/cnt, c2[2]/cnt, c2[3]/cnt);
+			System.out.format("%-10s%-20f%-20f%-20f%-20f\n", "cost1 max", c1max[0], c1max[1], c1max[2], c1max[3]);
+			System.out.format("%-10s%-20f%-20f%-20f%-20f\n", "cost2 max", c2max[0], c2max[1], c2max[2], c2max[3]);
 
 			
 		} catch (IOException e) {
