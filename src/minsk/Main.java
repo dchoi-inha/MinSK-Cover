@@ -29,7 +29,11 @@ public class Main {
 			Algorithm alg = new Algorithm();
 			Env.W = new Words();
 			Dataset db = construct("UK.txt");
-			int cnt = 10, l = 8;
+			Random r = new Random();
+
+			int cnt = 50, l;
+			for (l = 2; l <= 20; l = l+2) {
+			
 			
 //			RTree rt = new RTree();
 //			BRTree brt = new BRTree(Env.W);
@@ -59,10 +63,14 @@ public class Main {
 			double [] t = new double[a.length];
 			Group [] result = new Group[a.length];
 			
+			double [] n = new double[a.length];
+			double [] dia = new double[a.length];
+			
+			
 			for (int i = 0; i < cnt; i++){
 				System.out.print(i+" ");
+				if (i % 20 == 0 && i > 0) System.out.println();
 
-				Random r = new Random();
 				HashSet<String> T = Util.rand(l, Env.W, iv, db, r);
 //				HashSet<String> T = new HashSet<String>(Arrays.asList(new String [] {"Car", "Link", "Crescent", "Londonderry"}));
 				Debug._PrintL("T:(" + T.size() + ")" + T + "\n");
@@ -121,6 +129,8 @@ public class Main {
 					c2[j] += result[j].cost2();
 					c1max[j] = Math.max(c1max[j], result[j].cost1());
 					c2max[j] = Math.max(c2max[j], result[j].cost2());
+					n[j] += result[j].size();
+					dia[j] += result[j].dia();
 					
 					if (!result[j].covers(T)) {
 						System.err.println("result does not cover T");
@@ -135,11 +145,13 @@ public class Main {
 			System.out.format("%-10s%-15s%-15s%-15s%-15s%-15s\n", "", a[0], a[1], a[2], a[3], a[4]);
 			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "time avg.", t[0]/cnt, t[1]/cnt, t[2]/cnt, t[3]/cnt, t[4]/cnt);
 			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "cost1 avg.", c1[0]/cnt, c1[1]/cnt, c1[2]/cnt, c1[3]/cnt, c1[4]/cnt);
-			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "cost2 avg.", c2[0]/cnt, c2[1]/cnt, c2[2]/cnt, c2[3]/cnt, c2[4]/cnt);
+			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "N avg.", n[0]/cnt, n[1]/cnt, n[2]/cnt, n[3]/cnt, n[4]/cnt);
+			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "Dia. avg.", dia[0]/cnt, dia[1]/cnt, dia[2]/cnt, dia[3]/cnt, dia[4]/cnt);
 			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "cost1 max", c1max[0], c1max[1], c1max[2], c1max[3], c1max[4]);
+			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "cost2 avg.", c2[0]/cnt, c2[1]/cnt, c2[2]/cnt, c2[3]/cnt, c2[4]/cnt);
 			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "cost2 max", c2max[0], c2max[1], c2max[2], c2max[3], c2max[4]);
 
-			
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
