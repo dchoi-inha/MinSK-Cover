@@ -10,6 +10,7 @@ import minsk.Env;
 import minsk.Words;
 import minsk.rtree.Pair;
 import minsk.structure.Point;
+import minsk.util.Bitmap;
 import minsk.util.Debug;
 
 
@@ -24,6 +25,8 @@ public class CEntry  {
 	public CNode child;
 	
 	public double dist;
+	
+	public int icnt; // intersection count
 	
 	public CEntry(){
 		x = new Pair();
@@ -48,6 +51,12 @@ public class CEntry  {
 	
 	public boolean intersect(HashSet<String> T, Words w) {
 		return child.bmp.intersect(w.getBitmap(T));
+	}
+	
+	public int intersectCnt(HashSet<String> T, Words w) {
+		Bitmap tmp = new Bitmap(w.getBitmap(T));
+		tmp.and(child.bmp);
+		return tmp.cntSet();
 	}
 	
 	public boolean contains(String t, Words w) {
@@ -147,7 +156,20 @@ public class CEntry  {
 	};
 	public static Comparator<CEntry> CompareDist = new Comparator<CEntry>() {
 		public int compare(CEntry e1, CEntry e2) {
-			return (e1.dist > e2.dist ? 1: -1);
+			if (e1.dist > e2.dist) return 1;
+			else if (e1.dist < e2.dist) return -1;
+			else return 0;
+		}
+	};
+	
+	public static Comparator<CEntry> ComparePrice = new Comparator<CEntry>() {
+		public int compare(CEntry e1, CEntry e2) {
+			double price1 = e1.dist / (double)e1.icnt;
+			double price2 = e2.dist / (double)e2.icnt;
+			
+			if (price1 > price2) return 1;
+			else if (price1 < price2) return -1;
+			else return 0;
 		}
 	};
 	

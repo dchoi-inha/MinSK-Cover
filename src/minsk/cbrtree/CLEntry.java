@@ -33,6 +33,12 @@ public class CLEntry extends CEntry{
 		return (!tmp.isEmpty());
 	}
 	
+	public int intersectCnt(HashSet<String> T, Words w) {
+		HashSet<String> tmp = new HashSet<String>(T);
+		tmp.retainAll(obj.text);
+		return tmp.size();
+	}
+	
 	public int maxCard() {
 		return obj.text.size();
 	}

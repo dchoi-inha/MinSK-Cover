@@ -1,5 +1,7 @@
 package minsk.polartree;
 
+import java.util.ArrayList;
+
 import minsk.Words;
 import minsk.structure.Group;
 import minsk.structure.Range;
@@ -23,6 +25,7 @@ public class RBTree {
 	private RBNode root;
 	private int height = -1;
 	private STObject pole; // origin of the polar-tree
+	private ArrayList<STObject> objsAtSameLoc;
 	
 	public static StringBuffer status = new StringBuffer("");
 	
@@ -31,10 +34,13 @@ public class RBTree {
 		pole = o;
 		W = words;
 		polebmp = W.getBitmap(pole.text);
+		objsAtSameLoc = new ArrayList<STObject>();
 	}
 	
 	public Boolean insert(STObject obj) {
 		double dist = obj.loc.distance(pole.loc);
+		if (dist == 0) objsAtSameLoc.add(obj); 
+		
 		RBItem item = new RBItem(Util.getAngle(pole.loc, obj.loc), obj, dist);
 		return insert(item);
 	}
@@ -238,7 +244,7 @@ public class RBTree {
 	}
 	
 	public void _search(RBNode node, double theta, Range rng, double dist, Group g) {
-//		System.out.println("Range Search with " + rng);
+//		System.out.println("Range Search with " + rng + " at " + node);
 		RBItem item = node.item;
 		if (item == null) return;
 		if (!item.rng.intersect(rng)) return;
@@ -246,7 +252,10 @@ public class RBTree {
 		if (rng.l <= rng.h) {
 			if (rng.l <= item.getKey()) _search(node.leftChild, theta, rng, dist, g);
 			if (rng.covers(item.getKey())) {
-				if (2*dist*Math.sin(Math.toRadians(theta+item.ang-90.0)) >= item.dist)
+				double between = Util.rotateCCW(theta, 90);
+				between = Util.angleDiff(between, item.ang);
+				between = Math.toRadians(between);
+				if (2*dist*Math.sin(between) >= item.dist)
 					g.add(item.obj);
 			}
 			if (rng.h >= item.getKey()) _search(node.rightChild, theta, rng, dist, g);
@@ -266,8 +275,8 @@ public class RBTree {
 			_search(root, theta, rng, dist, g);
 		}
 		
-		g.add(pole);
-//		g.add(o);
+		if (!rng.covers(0.0)) g.addAll(objsAtSameLoc);
+		
 		return g;
 	}
 
@@ -281,7 +290,7 @@ public class RBTree {
 		_printLevel(root, level);
 	}
 	public void printTree() {
-		for (int i=1; i < 5; i++) {
+		for (int i=1; i < height(); i++) {
 			System.out.println(i+"-th level");
 			printLevel(i);
 			System.out.println();System.out.println();

@@ -156,7 +156,7 @@ public class CBRTree {
 		return knns;
 	}
 	
-	public STObject nextNN(Point q, HashSet<String> T, Words w, PriorityQueue<CEntry> pq) {
+	private STObject nextNN(Point q, HashSet<String> T, Words w, PriorityQueue<CEntry> pq) {
 		if (pq == null) {
 			pq = new PriorityQueue<CEntry>(11, CEntry.CompareDist);
 			for(int i = 0; i < R.size(); i++) {
@@ -205,29 +205,100 @@ public class CBRTree {
 		return nns;
 	}
 	
-	/**
-	 * @param o, the origin object
-	 * @param pq
-	 * @return the next NN of o whose cardinality is not larger than o.text
-	 */
-	public STObject nextNN(STObject o, PriorityQueue<CEntry> pq) {
-		if (pq == null ) pq = initPQ(o);
-		Point q = o.loc;
-		int len = o.text.size();
+	private double incurredDia(CEntry e, Group g) {
+		double dist;
+		double maxDist = Double.MIN_VALUE;
+		for (STObject o: g) {
+			dist = e.distTo(o.loc);
+			if (dist > maxDist)
+				maxDist = dist;
+		}
+		return maxDist;
+	}
+	private STObject nextPriceNN(Point q, HashSet<String> T, Words w, PriorityQueue<CEntry> pq, Group g) {
+		double dia = g.dia();
+		if (pq == null) {
+			pq = new PriorityQueue<CEntry>(11, CEntry.ComparePrice);
+			for(int i = 0; i < R.size(); i++) {
+				CEntry e = R.get(i);
+				if (e.intersect(T, w)) {
+					e.dist = e.distTo(q) - dia;
+//					e.dist = incurredDia(e, g) - dia; // incurred distance
+					e.icnt = e.intersectCnt(T, w);
+					pq.add(e);
+				}
+			}
+		}
 		CEntry next;
-		while ((next=pq.poll()) != null)
+		while ((next=pq.poll()) != null && !T.isEmpty())
 		{
 			if (next instanceof CLEntry) { // point
-				if (/*next.minCard() <= len &&*/ !((CLEntry)next).obj.checked) break;
-				else continue;
+				if (next.intersect(T, w)) {
+					T.removeAll(((CLEntry)next).obj.text);
+					
+					// update pq
+					Object [] entryArr = pq.toArray();
+					pq.clear();
+					for (Object o: entryArr) {
+						CEntry e = (CEntry)o;
+						e.dist = e.distTo(q) - dia;
+//						e.dist = incurredDia(e, g) - dia; // incurred distance
+						e.icnt = e.intersectCnt(T, w);
+						pq.add(e);
+					}
+					
+					break; // return this point
+				}
 			}
 			else {
 				for(int i = 0; i < next.child.size(); i++) { // node
 					CEntry e = next.child.get(i);
-//					if (e.minCard() <= len) {
+					if (e.intersect(T, w)) {
+						e.dist = e.distTo(q) - dia;
+//						e.dist = incurredDia(e, g) - dia; // incurred distance
+						e.icnt = e.intersectCnt(T, w);
+						pq.add(e);
+					}
+				}
+			}
+		}
+		return ((CLEntry)next).obj;
+	}
+	public Group textPriceNNSearch(Point q, HashSet<String> T, Words w) {
+		HashSet<String> Tmp = new HashSet<String>(T);
+		Group g = new Group();
+		PriorityQueue<CEntry> pq = new PriorityQueue<CEntry>(11, CEntry.ComparePrice);
+		for(int i = 0; i < R.size(); i++) {
+			CEntry e = R.get(i);
+			if (e.intersect(Tmp, w)) {
+				e.dist = e.distTo(q);
+				e.icnt = e.intersectCnt(Tmp, w);
+				pq.add(e);
+			}
+		}
+		while (!Tmp.isEmpty()) {
+			STObject next = nextPriceNN(q, Tmp, w, pq, g); 
+			g.add(next);
+			g.updateDia();
+		}
+		return g;
+	}
+	
+	public STObject nextNN(STObject o, PriorityQueue<CEntry> pq) {
+		if (pq == null ) pq = initPQ(o);
+		Point q = o.loc;
+		CEntry next;
+		while ((next=pq.poll()) != null)
+		{
+			if (next instanceof CLEntry) { // point
+				if (((CLEntry)next).obj.equals(o)) continue;
+				else break;
+			}
+			else {
+				for(int i = 0; i < next.child.size(); i++) { // node
+					CEntry e = next.child.get(i);
 						e.dist = e.distTo(q);
 						pq.add(e);
-//					}
 				}
 			}
 		}

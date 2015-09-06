@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Random;
 
 import minsk.structure.*;
 import minsk.util.Debug;
@@ -28,7 +29,7 @@ public class Main {
 			Algorithm alg = new Algorithm();
 			Env.W = new Words();
 			Dataset db = construct("UK.txt");
-			int cnt = 10, l = 10;
+			int cnt = 10, l = 8;
 			
 //			RTree rt = new RTree();
 //			BRTree brt = new BRTree(Env.W);
@@ -50,7 +51,7 @@ public class Main {
 			
 			long cpuTimeElapsed;
 			
-			String [] a = new String[]{"GKG", "SKECa+", "ScaleLune(w/o PT)", "ScaleLune(PT)"};
+			String [] a = new String[]{"GKG", "SKECa+", "ScaleLune(w/o PT)", "ScaleLune(PT)", "GreedyMinSK"};
 			double [] c1 = new double[a.length]; 
 			double [] c1max = new double[a.length];
 			double [] c2 = new double[a.length];
@@ -61,7 +62,8 @@ public class Main {
 			for (int i = 0; i < cnt; i++){
 				System.out.print(i+" ");
 
-				HashSet<String> T = Util.rand(l, Env.W, iv, db);
+				Random r = new Random();
+				HashSet<String> T = Util.rand(l, Env.W, iv, db, r);
 //				HashSet<String> T = new HashSet<String>(Arrays.asList(new String [] {"Car", "Link", "Crescent", "Londonderry"}));
 				Debug._PrintL("T:(" + T.size() + ")" + T + "\n");
 
@@ -87,7 +89,7 @@ public class Main {
 				result[1].shrink(T);
 				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed; t[1] += cpuTimeElapsed/(double)1000000000;
 				Debug._Print(result[1]);
-				Debug._Print("SKECaplus\t--------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
+				Debug._PrintL("SKECaplus\t--------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
 
 				// ScaleLuneCartesian algorithm
 				cpuTimeElapsed = Util.getCpuTime();
@@ -95,7 +97,7 @@ public class Main {
 				result[2].shrink(T);
 				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed; t[2] += cpuTimeElapsed/(double)1000000000;
 				Debug._Print(result[2]);
-				Debug._Print("ScaleLuneCartesian\t-----------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
+				Debug._PrintL("ScaleLuneCartesian\t-----------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
 				
 				// ScaleLunePolar algorithm
 				cpuTimeElapsed = Util.getCpuTime();
@@ -103,7 +105,15 @@ public class Main {
 				result[3].shrink(T);
 				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed; t[3] += cpuTimeElapsed/(double)1000000000;
 				Debug._Print(result[3]);
-				Debug._Print("ScaleLunePolar\t-----------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
+				Debug._PrintL("ScaleLunePolar\t-----------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
+				
+				// GreedyMinSK algorithm
+				cpuTimeElapsed = Util.getCpuTime();
+				result[4] = alg.GreedyMinSK(T, iv);
+				result[4].shrink(T);
+				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed; t[4] += cpuTimeElapsed/(double)1000000000;
+				Debug._Print(result[4]);
+				Debug._PrintL("GreedyMinSK\t-----------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
 				
 				
 				for (int j = 0; j < result.length; j++) {
@@ -122,12 +132,12 @@ public class Main {
 				Debug._Print("\n");
 			}
 			System.out.println();
-			System.out.format("%-10s%-20s%-20s%-20s%-20s\n", "", a[0], a[1], a[2], a[3]);
-			System.out.format("%-10s%-20f%-20f%-20f%-20f\n", "time avg.", t[0]/cnt, t[1]/cnt, t[2]/cnt, t[3]/cnt);
-			System.out.format("%-10s%-20f%-20f%-20f%-20f\n", "cost1 avg.", c1[0]/cnt, c1[1]/cnt, c1[2]/cnt, c1[3]/cnt);
-			System.out.format("%-10s%-20f%-20f%-20f%-20f\n", "cost2 avg.", c2[0]/cnt, c2[1]/cnt, c2[2]/cnt, c2[3]/cnt);
-			System.out.format("%-10s%-20f%-20f%-20f%-20f\n", "cost1 max", c1max[0], c1max[1], c1max[2], c1max[3]);
-			System.out.format("%-10s%-20f%-20f%-20f%-20f\n", "cost2 max", c2max[0], c2max[1], c2max[2], c2max[3]);
+			System.out.format("%-10s%-15s%-15s%-15s%-15s%-15s\n", "", a[0], a[1], a[2], a[3], a[4]);
+			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "time avg.", t[0]/cnt, t[1]/cnt, t[2]/cnt, t[3]/cnt, t[4]/cnt);
+			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "cost1 avg.", c1[0]/cnt, c1[1]/cnt, c1[2]/cnt, c1[3]/cnt, c1[4]/cnt);
+			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "cost2 avg.", c2[0]/cnt, c2[1]/cnt, c2[2]/cnt, c2[3]/cnt, c2[4]/cnt);
+			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "cost1 max", c1max[0], c1max[1], c1max[2], c1max[3], c1max[4]);
+			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "cost2 max", c2max[0], c2max[1], c2max[2], c2max[3], c2max[4]);
 
 			
 		} catch (IOException e) {

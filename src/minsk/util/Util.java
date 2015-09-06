@@ -136,9 +136,8 @@ public class Util {
 				bean.getCurrentThreadCpuTime(): 0L;
 	}
 	
-	public static HashSet<String> rand(int l, Words w, InvertedFile iv, Dataset db) {
+	public static HashSet<String> rand(int l, Words w, InvertedFile iv, Dataset db, Random r) {
 		HashSet<String> T = new HashSet<String>();
-		Random r = new Random();
 		for (int i = 0; i < l; i++) {
 			String s = w.words.get(r.nextInt(w.words.size()));
 			if (T.contains(s) || (iv.freq(s) < Env.FreqRate*(double)db.size())) {
@@ -159,13 +158,38 @@ public class Util {
 		return theta; 
 	}
 	
+	public static double rotateCCW(double angle, double amount) {
+		double rotatedAng = angle + amount;
+		if (rotatedAng < 0) rotatedAng += 360;
+		if (rotatedAng >= 360) rotatedAng -= 360;
+		
+		return rotatedAng;
+	}
+	
+	public static double angleDiff(double angle_1, double angle_2)
+	{
+		double diff = Math.abs(angle_1 - angle_2);
+		if (diff > 360/2)
+			diff = 360 - diff;
+		return diff;
+	}
+	
 	
 //	public static void main(String [] args) {
 //		
 //		Point origin = new Point(2, 2);
-//		Point target = new Point(4, 1.9);
+//		Point next = new Point(4, -1);
+//		Point ou = new Point (4, 4);
 //		
-//		System.out.println(getAngle(origin, target));
+//		double theta = getAngle(origin, next);
+//		double tu = getAngle(origin, ou);
+//		double thetaRot = rotateCCW(theta, 90);
+//		
+//		System.out.println(theta);
+//		System.out.println(thetaRot);
+//		System.out.println(tu);
+//		
+//		System.out.println(angleDiff(tu, thetaRot));
 //		
 //	}
 }

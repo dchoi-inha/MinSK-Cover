@@ -81,6 +81,16 @@ public class Bitmap {
 		return !tmp.isAllUnSet();
 	}
 	
+	public int cntSet() {
+		int cnt = 0;
+		
+		for (int i=0; i < len; i++) {
+			if (get(i)) cnt++;
+		}
+		
+		return cnt;
+	}
+	
 	public boolean isAllSet() {
 		
 		for (int i=0; i < len/Byte.SIZE; i++) {

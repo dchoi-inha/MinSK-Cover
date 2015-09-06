@@ -2,6 +2,7 @@ package minsk.structure;
 
 import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 
@@ -49,6 +50,18 @@ public class Group implements Iterable<STObject>{
 		}
 	}
 	
+	public void updateDia() {
+		double max = Double.MIN_VALUE;
+		double dist;
+		for (int i=0; i < g.size(); i++) {
+			for (int j=i+1; j < g.size(); j++) {
+				dist = g.get(i).loc.distance(g.get(j).loc);
+				if ( max < dist ) max = dist;
+			}
+		}
+		d = max;
+	}
+
 	public double cost1() {
 		return size()*dia();
 	}
@@ -101,6 +114,10 @@ public class Group implements Iterable<STObject>{
 	@Override
 	public Iterator<STObject> iterator() {
 		return g.iterator();
+	}
+	
+	public void sort() {
+		Collections.sort(g, STObject.CompareLoc);
 	}
 	
 	public String toString() {
