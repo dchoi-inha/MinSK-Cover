@@ -26,36 +26,50 @@ public class Main {
 
 	public static void main(String[] args) {
 		try {
+			System.out.println("max memory size: " + java.lang.Runtime.getRuntime().maxMemory()/(double)1024/(double)1024 + "MBs");
+			
 			Algorithm alg = new Algorithm();
 			Env.W = new Words();
-			Dataset db = construct("UK.txt");
+			Dataset db = construct("UK_10000.txt");
+//			ArrayList<HashSet<String>> queries = loadQueries(Env.HomeDir+"UK_T/UK_T.queries");
 			Random r = new Random();
-
-			int cnt = 50, l;
-			for (l = 2; l <= 20; l = l+2) {
-			
-			
-//			RTree rt = new RTree();
-//			BRTree brt = new BRTree(Env.W);
 			InvertedFile iv = new InvertedFile();
-//			LinList list = new LinList();
-
+			HashSet<String> T;
+			
 			System.out.print("Indexing Start");
 			for (STObject o: db) {
-//				rt.insert(o);
-//				brt.insert(o);
 				iv.add(o);
-//				list.add(o);
 			}
 			System.out.println("---Indexing End");
+
+			int cnt = 10, l = 6; 
+			double freqRate;
+			freqRate = 0.01; // ratio of frequency of each query keyword to n 
+
+			/* varying |T| */
+//			for (l = 2; l <= 10; l = l+2)
+//			for (int q = 0; q < queries.size()/cnt; q++) 
+//			{
+			
+				
+			/* varying freqRate */
+			double [] rates = new double[]{0.0025, 0.005, 0.02, 0.04};
+			for (int f = 0; f < rates.length; f++) {
+			freqRate = rates[f];
+			
 			
 			System.out.print("M: " + RTree.M + " m: " + RTree.m);
 //			System.out.print(" objects: " + db.size() + " nodes: "+rt.nodes+" heights: "+rt.height);
+//			System.out.println(" keywords: " + Env.W.size() + " |T|: " + queries.get(q*cnt).size()+"\n");
 			System.out.println(" keywords: " + Env.W.size() + " |T|: " + l+"\n");
+//			int maxFreq = iv.maxFreq();
+//			System.out.println(" Max Freq: " + maxFreq + " Max Freq Rate: " + (double)maxFreq/(double)db.size()+"\n");
+//			System.out.println("keywords: " + Env.W.size() + " Freq Rate: " + freqRate+"\n");
 			
 			long cpuTimeElapsed;
 			
-			String [] a = new String[]{"GKG", "SKECa+", "ScaleLune(w/o PT)", "ScaleLune(PT)", "GreedyMinSK"};
+//			String [] a = new String[]{"GKG", "SKECa+", "ScaleLune(w/o PT)", "ScaleLune(PT)", "GreedyMinSK"};
+			String [] a = new String[]{"MinLune", "ScaleLune(w/o PT)", "ScaleLune(PT)"};
 			double [] c1 = new double[a.length]; 
 			double [] c1max = new double[a.length];
 			double [] c2 = new double[a.length];
@@ -71,57 +85,62 @@ public class Main {
 				System.out.print(i+" ");
 				if (i % 20 == 0 && i > 0) System.out.println();
 
-				HashSet<String> T = Util.rand(l, Env.W, iv, db, r);
-//				HashSet<String> T = new HashSet<String>(Arrays.asList(new String [] {"Car", "Link", "Crescent", "Londonderry"}));
-				Debug._PrintL("T:(" + T.size() + ")" + T + "\n");
-
-				// Greedy Keyword Group (GKG) on a virtual bR-tree
+//				T = queries.get(q*cnt+i);
+				T = Util.rand(l, Env.W, iv, db, r, freqRate);
+//				T = new HashSet<String>(Arrays.asList(new String [] {"Car", "Link", "Crescent", "Londonderry"}));
+				Debug._PrintL("T:(" + T.size() + ")" + T);
+				Debug._PrintL("Freq Rate: " + freqRate + "\n");
+				
+				
+				
+				// MinLune without Pruning
 				cpuTimeElapsed = Util.getCpuTime();
-				result[0] = alg.GKG(T, iv);
+				result[0] = alg.MinLune(T, iv);
 				result[0].shrink(T);
 				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed; t[0] += cpuTimeElapsed/(double)1000000000;
 				Debug._Print(result[0]);
-				Debug._PrintL("GKG\t----------------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
+				Debug._PrintL("MinLune\t-----------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
 				
-				// SKECa algorithm
-//				cpuTimeElapsed = Util.getCpuTime();
-//				Group result5 = alg.SKECa(T, iv);
-//				result5.shrink(T);
-//				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed;
-//				Debug._Print(result5);
-//				Debug._PrintL("SKECa\t----------------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
 
-				// SKECa+ algorithm
+//				// Greedy Keyword Group (GKG) on a virtual bR-tree
+//				cpuTimeElapsed = Util.getCpuTime();
+//				result[0] = alg.GKG(T, iv);
+//				result[0].shrink(T);
+//				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed; t[0] += cpuTimeElapsed/(double)1000000000;
+//				Debug._Print(result[0]);
+//				Debug._PrintL("GKG\t----------------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
+//				
+//				// SKECa+ algorithm
+//				cpuTimeElapsed = Util.getCpuTime();
+//				result[1] = alg.SKECaplus(T, iv);
+//				result[1].shrink(T);
+//				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed; t[1] += cpuTimeElapsed/(double)1000000000;
+//				Debug._Print(result[1]);
+//				Debug._PrintL("SKECaplus\t--------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
+//
+				// ScaleLuneCartesian algorithm
 				cpuTimeElapsed = Util.getCpuTime();
-				result[1] = alg.SKECaplus(T, iv);
+				result[1] = alg.ScaleLuneCartesian(T, iv);
 				result[1].shrink(T);
 				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed; t[1] += cpuTimeElapsed/(double)1000000000;
 				Debug._Print(result[1]);
-				Debug._PrintL("SKECaplus\t--------------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
-
-				// ScaleLuneCartesian algorithm
-				cpuTimeElapsed = Util.getCpuTime();
-				result[2] = alg.ScaleLuneCartesian(T, iv);
-				result[2].shrink(T);
-				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed; t[2] += cpuTimeElapsed/(double)1000000000;
-				Debug._Print(result[2]);
 				Debug._PrintL("ScaleLuneCartesian\t-----------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
 				
 				// ScaleLunePolar algorithm
 				cpuTimeElapsed = Util.getCpuTime();
-				result[3] = alg.ScaleLunePolar(T, iv);
-				result[3].shrink(T);
-				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed; t[3] += cpuTimeElapsed/(double)1000000000;
-				Debug._Print(result[3]);
+				result[2] = alg.ScaleLunePolar(T, iv);
+				result[2].shrink(T);
+				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed; t[2] += cpuTimeElapsed/(double)1000000000;
+				Debug._Print(result[2]);
 				Debug._PrintL("ScaleLunePolar\t-----------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
-				
-				// GreedyMinSK algorithm
-				cpuTimeElapsed = Util.getCpuTime();
-				result[4] = alg.GreedyMinSK(T, iv);
-				result[4].shrink(T);
-				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed; t[4] += cpuTimeElapsed/(double)1000000000;
-				Debug._Print(result[4]);
-				Debug._PrintL("GreedyMinSK\t-----------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
+//				
+//				// GreedyMinSK algorithm
+//				cpuTimeElapsed = Util.getCpuTime();
+//				result[4] = alg.GreedyMinSK(T, iv);
+//				result[4].shrink(T);
+//				cpuTimeElapsed = Util.getCpuTime() - cpuTimeElapsed; t[4] += cpuTimeElapsed/(double)1000000000;
+//				Debug._Print(result[4]);
+//				Debug._PrintL("GreedyMinSK\t-----------------------------" + cpuTimeElapsed/(double)1000000000+"\n");
 				
 				
 				for (int j = 0; j < result.length; j++) {
@@ -142,19 +161,47 @@ public class Main {
 				Debug._Print("\n");
 			}
 			System.out.println();
-			System.out.format("%-10s%-15s%-15s%-15s%-15s%-15s\n", "", a[0], a[1], a[2], a[3], a[4]);
-			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "time avg.", t[0]/cnt, t[1]/cnt, t[2]/cnt, t[3]/cnt, t[4]/cnt);
-			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "cost1 avg.", c1[0]/cnt, c1[1]/cnt, c1[2]/cnt, c1[3]/cnt, c1[4]/cnt);
-			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "N avg.", n[0]/cnt, n[1]/cnt, n[2]/cnt, n[3]/cnt, n[4]/cnt);
-			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "Dia. avg.", dia[0]/cnt, dia[1]/cnt, dia[2]/cnt, dia[3]/cnt, dia[4]/cnt);
-			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "cost1 max", c1max[0], c1max[1], c1max[2], c1max[3], c1max[4]);
-			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "cost2 avg.", c2[0]/cnt, c2[1]/cnt, c2[2]/cnt, c2[3]/cnt, c2[4]/cnt);
-			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "cost2 max", c2max[0], c2max[1], c2max[2], c2max[3], c2max[4]);
+			System.out.format("%-10s%-15s%-15s%-15s\n", "", a[0], a[1], a[2]);
+			System.out.format("%-10s%-15f%-15f%-15f\n", "time avg.", t[0]/cnt, t[1]/cnt, t[2]/cnt);
+			System.out.format("%-10s%-15f%-15f%-15f\n", "cost1 avg.", c1[0]/cnt, c1[1]/cnt, c1[2]/cnt);
+			System.out.format("%-10s%-15f%-15f%-15f\n", "N avg.", n[0]/cnt, n[1]/cnt, n[2]/cnt);
+			System.out.format("%-10s%-15f%-15f%-15f\n", "Dia. avg.", dia[0]/cnt, dia[1]/cnt, dia[2]/cnt);
+			System.out.format("%-10s%-15f%-15f%-15f\n", "cost1 max", c1max[0], c1max[1], c1max[2]);
+			System.out.format("%-10s%-15f%-15f%-15f\n", "cost2 avg.", c2[0]/cnt, c2[1]/cnt, c2[2]/cnt);
+			System.out.format("%-10s%-15f%-15f%-15f\n", "cost2 max", c2max[0], c2max[1], c2max[2]);
+//			System.out.format("%-10s%-15s%-15s%-15s%-15s%-15s\n", "", a[0], a[1], a[2], a[3], a[4]);
+//			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "time avg.", t[0]/cnt, t[1]/cnt, t[2]/cnt, t[3]/cnt, t[4]/cnt);
+//			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "cost1 avg.", c1[0]/cnt, c1[1]/cnt, c1[2]/cnt, c1[3]/cnt, c1[4]/cnt);
+//			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "N avg.", n[0]/cnt, n[1]/cnt, n[2]/cnt, n[3]/cnt, n[4]/cnt);
+//			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "Dia. avg.", dia[0]/cnt, dia[1]/cnt, dia[2]/cnt, dia[3]/cnt, dia[4]/cnt);
+//			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "cost1 max", c1max[0], c1max[1], c1max[2], c1max[3], c1max[4]);
+//			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "cost2 avg.", c2[0]/cnt, c2[1]/cnt, c2[2]/cnt, c2[3]/cnt, c2[4]/cnt);
+//			System.out.format("%-10s%-15f%-15f%-15f%-15f%-15f\n", "cost2 max", c2max[0], c2max[1], c2max[2], c2max[3], c2max[4]);
 
-			}
+			
+			} // end of all experiments
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static ArrayList<HashSet<String>> loadQueries(String filename) throws IOException {
+		ArrayList<HashSet<String>> queries = new ArrayList<HashSet<String>>();
+		BufferedReader in = new BufferedReader(new FileReader(new File(filename)));
+		
+		System.out.print("Query Load Start");
+		
+		for (String line = in.readLine(); line != null; line = in.readLine()) {
+			String [] tokens = line.split(",");
+			HashSet<String> query = new HashSet<String>();
+			for (String word : tokens) {
+				query.add(word.trim());
+			}
+			queries.add(query);
+		}
+		System.out.print("---Query Load End\n");
+		return queries;
 	}
 
 	public static Dataset construct(String filename) throws IOException{

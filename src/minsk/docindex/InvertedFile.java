@@ -93,4 +93,15 @@ public class InvertedFile {
 		}
 		return new Dataset(tmp.values());
 	}
+	
+	public int maxFreq() {
+		int freq, maxFreq = Integer.MIN_VALUE;
+		for (String t: map.keySet()) {
+			freq = freq(t);
+			if (maxFreq < freq) {
+				maxFreq = freq;
+			}
+		}
+		return maxFreq;
+	}
 }

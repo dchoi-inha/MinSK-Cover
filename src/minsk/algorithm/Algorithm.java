@@ -459,4 +459,105 @@ public class Algorithm {
 		
 		return gmin;
 	}
+	
+	public Group MinLune(HashSet<String> T, InvertedFile iv) {
+		Dataset db = iv.filter(T);
+		Words w = new Words(T);
+		CBRTree crt = new CBRTree(w);
+		for (STObject o: db) {
+			crt.insert(o);
+		}
+
+		Group gr, gk, gl, g;
+		int kLB;
+		double rLB, fmin;
+
+		// Lines 5 - 6
+		gr = GKG4ScaleLune(T, crt, iv, w); 
+		rLB = gr.dia()*0.5;
+		gk = fastSetCover(db, T); 
+		kLB = gk.size();
+		gr.shrink(T);
+		if (gr.cost1() > gk.cost1()) {
+			g = gk; fmin = gk.cost1();
+		} else {
+			g = gr; fmin = gr.cost1();
+		}
+
+		Debug._PrintL("rLB: " + rLB + " kLB: " + kLB + " costLB: " + rLB*kLB);
+
+
+		for (STObject o: db) {
+			o.checked = true;
+			PriorityQueue<CEntry> pq = crt.initPQ(o);
+			STObject nn = crt.nextNN(o, pq);
+			while(nn != null) {
+				if (!nn.checked) {
+					Lune lune = new Lune(o.loc, nn.loc);
+					gl = crt.luneRangeSearch(lune);
+					if (gl.covers(T)) {
+						gl = fastSetCover(gl, T);
+						if (gl.cost1() < fmin) {
+							fmin = gl.cost1();
+							g = gl;
+						}
+					}
+				}
+				nn = crt.nextNN(o, pq);
+			}
+		}
+
+		return g;
+	}
+	
+	public Group MinLuneSpatialPrune(HashSet<String> T, InvertedFile iv) {
+		Dataset db = iv.filter(T);
+		Words w = new Words(T);
+		CBRTree crt = new CBRTree(w);
+		for (STObject o: db) {
+			crt.insert(o);
+		}
+
+		Group gr, gk, gl, g;
+		int kLB;
+		double rLB, fmin;
+
+		// Lines 5 - 6
+		gr = GKG4ScaleLune(T, crt, iv, w); 
+		rLB = gr.dia()*0.5;
+		gk = fastSetCover(db, T); 
+		kLB = gk.size();
+		gr.shrink(T);
+		if (gr.cost1() > gk.cost1()) {
+			g = gk; fmin = gk.cost1();
+		} else {
+			g = gr; fmin = gr.cost1();
+		}
+
+		Debug._PrintL("rLB: " + rLB + " kLB: " + kLB + " costLB: " + rLB*kLB);
+
+
+		for (STObject o: db) {
+			o.checked = true;
+			PriorityQueue<CEntry> pq = crt.initPQ(o);
+			STObject nn = crt.nextNN(o, pq);
+			while(nn != null && o.loc.distance(nn.loc) < fmin/(double)kLB) {
+				if (!nn.checked) {
+					Lune lune = new Lune(o.loc, nn.loc);
+					gl = crt.luneRangeSearch(lune);
+					if (gl.covers(T)) {
+						gl = fastSetCover(gl, T);
+						if (gl.cost1() < fmin) {
+							fmin = gl.cost1();
+							g = gl;
+						}
+					}
+				}
+				nn = crt.nextNN(o, pq);
+			}
+		}
+
+		return g;
+	}
+
 }

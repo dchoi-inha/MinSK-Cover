@@ -19,7 +19,5 @@ public class Env {
 
 	public static double Ep = 0.01; // epsilon parameter for SKECa
 	
-	public static final double FreqRate = 0.01; // ratio of frequency of each query keyword to n
-	
 	public static final double P = 1.5; // p parameter for fast Set Cover algorithm
 }
