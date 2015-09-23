@@ -63,12 +63,35 @@ public class Group implements Iterable<STObject>{
 	}
 
 	public double cost1() {
-		return size()*dia();
+		return (size()-1)*dia();
 	}
 	public double cost2() {
 		long n = (long) size();
 		long comb = n*(n-1)/2;
 		return comb * dia();
+	}
+	
+	public double rcost1() {
+		sort();
+		STObject obj = g.get(0);
+		double rcost1 = 0;
+		
+		for (STObject o: g) {
+			rcost1 += obj.loc.distance(o.loc);
+		}
+		return rcost1;
+	}
+	public double rcost2() {
+		STObject o1, o2;
+		double rcost2 = 0;
+		for (int i=0; i < g.size(); i++) {
+			o1 = g.get(i);
+			for (int j=i; j < g.size(); j++) {
+				o2 = g.get(j);
+				rcost2 += o1.loc.distance(o2.loc);
+			}
+		}
+		return rcost2;
 	}
 	
 	public void add(STObject o) {
@@ -125,6 +148,7 @@ public class Group implements Iterable<STObject>{
 		
 		s.append("dia: " + dia() + " n: " + size() + "\n");
 		s.append("cost1: " + cost1() + " cost2: " + cost2() + "\n");
+		s.append("rcost1: " + rcost1() + " rcost2: " + rcost2() + "\n");
 		s.append(g.toString() + "\n");
 //		for (STObject o: g) s += o.toString() + "\n";
 		

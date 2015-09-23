@@ -9,7 +9,7 @@ package minsk;
  */
 public class Env {
 
-	public static final String HomeDir = System.getProperty("user.home") + "/study/exp/minsk/";
+	public static final String HomeDir = System.getProperty("user.home") + "/exp/minsk/";
 	
 	public static double MaxCoord = 1.0;
 	

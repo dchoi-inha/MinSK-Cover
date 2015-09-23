@@ -305,6 +305,46 @@ public class CBRTree {
 		if (next != null) return ((CLEntry)next).obj;
 		else return null;
 	}
+	
+	private CLEntry nextNNEntry(STObject o, PriorityQueue<CEntry> pq) {
+		if (pq == null ) pq = initPQ(o);
+		Point q = o.loc;
+		CEntry next;
+		while ((next=pq.poll()) != null)
+		{
+			if (next instanceof CLEntry) { // point
+				if (((CLEntry)next).obj.equals(o)) continue;
+				else break;
+			}
+			else {
+				for(int i = 0; i < next.child.size(); i++) { // node
+					CEntry e = next.child.get(i);
+						e.dist = e.distTo(q);
+						pq.add(e);
+				}
+			}
+		}
+		return (CLEntry) next;
+	}
+	public ArrayList<STObject> nextNNs(STObject o, PriorityQueue<CEntry> pq) {
+		ArrayList<STObject> nns = new ArrayList<STObject>();
+		STObject nn1 = nextNN(o, pq);
+		nns.add(nn1);
+		STObject next;
+		CLEntry nextEntry;
+		double dist = nn1.loc.distance(o.loc);
+		
+		while ((nextEntry = nextNNEntry(o, pq)) != null) {
+			next = nextEntry.obj;
+			if (next.loc.distance(o.loc) == dist) {
+				nns.add(next);
+			} else {
+				pq.add(nextEntry);
+				break;
+			}
+		}
+		return nns;		
+	}
 
 	public PriorityQueue<CEntry> initPQ(STObject o) {
 		Point q = o.loc;

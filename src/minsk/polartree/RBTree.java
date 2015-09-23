@@ -44,6 +44,22 @@ public class RBTree {
 		RBItem item = new RBItem(Util.getAngle(pole.loc, obj.loc), obj, dist);
 		return insert(item);
 	}
+	
+	public Boolean insert(ArrayList<STObject> objs) {
+		Boolean isFinCovering = null;
+		for (STObject obj: objs) {
+			double dist = obj.loc.distance(pole.loc);
+			if (dist == 0) objsAtSameLoc.add(obj);
+			
+			RBItem item = new RBItem(Util.getAngle(pole.loc, obj.loc), obj, dist);
+			Boolean isCovering = insert(item);
+			if (isCovering != null) {
+				if (isFinCovering == null) isFinCovering = isCovering;
+				else isFinCovering |= isCovering;
+			}
+		}
+		return isFinCovering;
+	}
 
 	/**
 	 * @param item, to be inserted

@@ -332,7 +332,7 @@ public class Algorithm {
 		gr = GKG4ScaleLune(T, crt, iv, w); 
 		rLB = gr.dia()*0.5;
 		gk = fastSetCover(db, T); 
-		kLB = gk.size();
+		kLB = gk.size() - 1;
 		gr.shrink(T);
 		if (gr.cost1() > gk.cost1()) {
 			g = gk; fmin = gk.cost1();
@@ -391,7 +391,7 @@ public class Algorithm {
 		gr = GKG4ScaleLune(T, crt, iv, w); 
 		rLB = gr.dia()*0.5;
 		gk = fastSetCover(db, T); 
-		kLB = gk.size();
+		kLB = gk.size()-1;
 		gr.shrink(T);
 		if (gr.cost1() > gk.cost1()) {
 			g = gk; fmin = gk.cost1();
@@ -409,31 +409,35 @@ public class Algorithm {
 				o.checked = true;
 				RBTree pt = new RBTree(w, o);
 				PriorityQueue<CEntry> pq = crt.initPQ(o);
-				STObject nn = crt.nextNN(o, pq);
-				while(nn != null && o.loc.distance(nn.loc) < fmin/(double)kLB) {
-					isCovering = pt.insert(nn);
+				ArrayList<STObject> nns = crt.nextNNs(o, pq);				
+				while(!nns.isEmpty() && o.loc.distance(nns.get(0).loc) < fmin/(double)kLB) {
+					isCovering = pt.insert(nns);
 					if (Math.ceil(T.size()/l)*rLB >= fmin) return g;
 
-					if (nn.checked || nn.text.size() > l) isCovering = false;
-					if (isCovering == null || isCovering.equals(true)) {
-						gl = pt.rangeSearch(nn); gl.add(o);
-						if (isCovering == null)
-							isCovering = gl.covers(T);
-						if (isCovering.equals(true)) {
-							gl = fastSetCover(gl, T);
-							if (gl.cost1() < fmin) {
-								fmin = gl.cost1();
-								g = gl;
+					for (STObject nn: nns) {
+						if (nn.checked || nn.text.size() > l) isCovering = false;
+					
+						if (isCovering == null || isCovering.equals(true)) {
+							gl = pt.rangeSearch(nn); gl.add(o);
+							if (isCovering == null)
+								isCovering = gl.covers(T);
+							if (isCovering.equals(true)) {
+								gl = fastSetCover(gl, T);
+								if (gl.cost1() < fmin) {
+									fmin = gl.cost1();
+									g = gl;
+								}
 							}
 						}
 					}
-					nn = crt.nextNN(o, pq);
+					nns = crt.nextNNs(o, pq);
 				}
 			}
 		}
 		
 		return g;
 	}
+
 	
 	public Group GreedyMinSK(HashSet<String> T, InvertedFile iv) {
 		Group g = null, gmin = null;
