@@ -15,7 +15,7 @@ import minsk.Env;
 public class Debug {
 	
 	public static boolean flag = false;
-	private static final String logFileName = Env.HomeDir + "/logs/minsk.log";
+	public static String logFileName = Env.HomeDir + "/logs/minsk.log";
 	
 	public static void _PrintL(String str) {
 		if (flag) System.out.println(str);

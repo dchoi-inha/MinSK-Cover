@@ -73,14 +73,81 @@ public class Group implements Iterable<STObject>{
 	
 	public double rcost1() {
 		sort();
-		STObject obj = g.get(0);
-		double rcost1 = 0;
+//		STObject obj = g.get(0);
+//		double rcost1 = 0;
+//		
+//		for (STObject o: g) {
+//			rcost1 += obj.loc.distance(o.loc);
+//		}
+//		return rcost1;
 		
-		for (STObject o: g) {
-			rcost1 += obj.loc.distance(o.loc);
+//		double cost, minCost = Double.MAX_VALUE;
+//		STObject o1, o2;
+//		
+//		for (int i=0; i < g.size(); i++) {
+//			o1 = g.get(i);
+//			cost = 0;
+//			for (int j=0; j < g.size(); j++) {
+//				o2 = g.get(j);
+//				cost += o1.loc.distance(o2.loc);
+//			}
+//			if (cost < minCost) {
+//				minCost = cost;
+//			}
+//		}
+//		return minCost;
+		
+		double cost, maxCost = Double.MIN_VALUE;
+		STObject o1, o2;
+		
+		for (int i=0; i < g.size(); i++) {
+			o1 = g.get(i);
+			cost = 0;
+			for (int j=0; j < g.size(); j++) {
+				o2 = g.get(j);
+				cost += o1.loc.distance(o2.loc);
+			}
+			if (cost > maxCost) {
+				maxCost = cost;
+			}
 		}
-		return rcost1;
+		return maxCost;
 	}
+	
+	
+//	public double rcost1() {
+//		return permuteCost(0);
+//	}
+	
+	public double permuteCost(int k) {
+		double cost = 0, maxCost = Double.MIN_VALUE;
+		STObject o1, o2;
+		for (int i = k; i < g.size(); i++) {
+			Collections.swap(g, i, k);
+			maxCost = Math.max(permuteCost(k+1), maxCost);
+			Collections.swap(g, k, i);
+		}
+		if (k == g.size() -1) {
+			for (int j=0; j < g.size()-1; j++) {
+				o1 = g.get(j);
+				o2 = g.get(j+1);
+				cost += o1.loc.distance(o2.loc);
+			}
+			
+			o1 = g.get(g.size()-1);
+			o2 = g.get(0);
+			cost += o1.loc.distance(o2.loc);
+
+//			System.out.println(g);
+//			System.out.println("cost = " + cost);
+		}
+		
+		maxCost = Math.max(maxCost, cost);
+		
+		return maxCost;
+	}
+	
+	
 	public double rcost2() {
 		STObject o1, o2;
 		double rcost2 = 0;

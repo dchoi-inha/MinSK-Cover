@@ -1,9 +1,7 @@
 package minsk.algorithm;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 
@@ -25,7 +23,6 @@ import minsk.structure.Lune;
 import minsk.structure.STObject;
 import minsk.structure.WordTab;
 import minsk.util.Debug;
-import minsk.util.PairObject;
 import minsk.util.Util;
 
 public class Algorithm {
@@ -332,7 +329,7 @@ public class Algorithm {
 		gr = GKG4ScaleLune(T, crt, iv, w); 
 		rLB = gr.dia()*0.5;
 		gk = fastSetCover(db, T); 
-		kLB = gk.size() - 1;
+		kLB = gk.size()-1;
 		gr.shrink(T);
 		if (gr.cost1() > gk.cost1()) {
 			g = gk; fmin = gk.cost1();
@@ -351,7 +348,7 @@ public class Algorithm {
 				PriorityQueue<CEntry> pq = crt.initPQ(o);
 				STObject nn = crt.nextNN(o, pq);
 				while(nn != null && o.loc.distance(nn.loc) < fmin/(double)kLB) {
-					if (Math.ceil(T.size()/l)*rLB >= fmin) return g;
+					if ((Math.ceil(T.size()/l)-1)*rLB >= fmin) return g;
 					
 					if (!nn.checked && nn.text.size() <= l) {
 						Lune lune = new Lune(o.loc, nn.loc);
@@ -412,14 +409,14 @@ public class Algorithm {
 				ArrayList<STObject> nns = crt.nextNNs(o, pq);				
 				while(!nns.isEmpty() && o.loc.distance(nns.get(0).loc) < fmin/(double)kLB) {
 					isCovering = pt.insert(nns);
-					if (Math.ceil(T.size()/l)*rLB >= fmin) return g;
+					if ((Math.ceil(T.size()/l)-1)*rLB >= fmin) return g;
 
 					for (STObject nn: nns) {
 						if (nn.checked || nn.text.size() > l) isCovering = false;
 					
 						if (isCovering == null || isCovering.equals(true)) {
 							gl = pt.rangeSearch(nn); gl.add(o);
-							if (isCovering == null)
+							if (isCovering == null || (isCovering == true && nns.size()>1))
 								isCovering = gl.covers(T);
 							if (isCovering.equals(true)) {
 								gl = fastSetCover(gl, T);

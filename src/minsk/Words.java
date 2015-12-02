@@ -18,7 +18,7 @@ import minsk.util.Util;
  * 
  * This class can be a query object in our MinSK problem.
  */
-public class Words {
+public class Words { 
 
 	public HashMap<String, Integer> indices; // a word to an integer representing a position of a bitmap
 	public ArrayList<String> words;

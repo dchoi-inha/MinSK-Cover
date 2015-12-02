@@ -67,6 +67,7 @@ public class STObject {
 	{
 //		return id+"" ;
 		return id + loc.toString()+"["+text.size()+"]";
+//		return id + loc.toString()+"["+text.size()+"]"+text.toString();
 //		return id + "-->" + loc.toString() + " " + text.toString();
 	}
 	
